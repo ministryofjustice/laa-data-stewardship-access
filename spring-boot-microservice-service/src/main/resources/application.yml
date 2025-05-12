@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: LAA Spring Boot Microservice
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/laa_db
+    driver-class-name: org.postgresql.Driver
+    username: laa_user
+    password: laa_password
+
+  jpa:
+    hibernate:
+      ddl-auto: none  # Or update to validate/update as needed
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always
+      continue-on-error: true  # helpful for dev environment
+
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      credentials:
+        access-key: test
+        secret-key: test
+      sqs:
+        endpoint: http://localhost:4566
+
+info:
+  app:
+    name: LAA Spring Boot Microservice application
+    description: An example Spring Boot Microservice application that provides a REST API.
+    version: 1.0.0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true

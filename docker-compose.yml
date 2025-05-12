@@ -1,0 +1,35 @@
+services:
+#  app:
+#    build:
+#      context: .
+#    ports:
+#      - "8080:8080"
+
+  localstack:
+    image: localstack/localstack:3
+    ports:
+      - 4566:4566
+    environment:
+      - SERVICES=sqs
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  postgres:
+    image: postgres:14.3
+    container_name: laa-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: laa_db
+      POSTGRES_USER: laa_user
+      POSTGRES_PASSWORD: laa_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  localstack_data:
+  pgdata:
