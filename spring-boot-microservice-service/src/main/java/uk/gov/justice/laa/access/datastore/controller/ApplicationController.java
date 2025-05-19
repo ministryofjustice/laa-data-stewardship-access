@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,12 +11,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.justice.laa.access.datastore.api.ApplicationsApi;
 import uk.gov.justice.laa.access.datastore.common.logging.aspects.LogMethodArguments;
 import uk.gov.justice.laa.access.datastore.common.logging.aspects.LogMethodResponse;
-import uk.gov.justice.laa.access.datastore.config.SqsProducer;
-import uk.gov.justice.laa.access.datastore.config.audit.AuditorAwareImpl;
 import uk.gov.justice.laa.access.datastore.model.Application;
-import uk.gov.justice.laa.access.datastore.model.ApplicationHistoryEntry;
-import uk.gov.justice.laa.access.datastore.model.ApplicationHistoryRequestBody;
 import uk.gov.justice.laa.access.datastore.model.ApplicationRequestBody;
+import uk.gov.justice.laa.access.datastore.model.ApplicationUpdateRequestBody;
 import uk.gov.justice.laa.access.datastore.service.ApplicationService;
 
 /**
@@ -28,8 +24,6 @@ import uk.gov.justice.laa.access.datastore.service.ApplicationService;
 public class ApplicationController implements ApplicationsApi {
 
   private final ApplicationService service;
-
-  private final SqsProducer sqsProducer;
 
   @Override
   @LogMethodResponse
@@ -59,10 +53,9 @@ public class ApplicationController implements ApplicationsApi {
   @Override
   @LogMethodResponse
   @LogMethodArguments
-  public ResponseEntity<Void> updateApplication(UUID id, ApplicationRequestBody applicationRequestBody) {
-//    service.updateItem(id, applicationRequestBody);
-//    return ResponseEntity.noContent().build();
-    return null;
+  public ResponseEntity<Void> updateApplication(UUID id, ApplicationUpdateRequestBody applicationUpdateRequestBody) {
+    service.updateApplication(id, applicationUpdateRequestBody);
+    return ResponseEntity.noContent().build();
   }
 
   @Override
@@ -74,19 +67,5 @@ public class ApplicationController implements ApplicationsApi {
     return null;
   }
 
-  @Override
-  @LogMethodResponse
-  @LogMethodArguments
-  public ResponseEntity<Void> recordApplicationHistory(
-      final UUID id,
-      final ApplicationHistoryRequestBody applicationHistoryRequestBody) {
-    return null;
-  }
 
-  @Override
-  @LogMethodResponse
-  @LogMethodArguments
-  public ResponseEntity<List<ApplicationHistoryEntry>> getApplicationHistory(final UUID id) {
-    return null;
-  }
 }

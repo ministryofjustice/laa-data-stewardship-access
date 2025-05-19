@@ -1,26 +1,48 @@
 package uk.gov.justice.laa.access.datastore.service;
 
+import static uk.gov.justice.laa.access.datastore.model.ActionType.CREATED;
+import static uk.gov.justice.laa.access.datastore.model.ActionType.UPDATED;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.reflect.Field;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.access.datastore.config.SqsProducer;
 import uk.gov.justice.laa.access.datastore.entity.ApplicationEntity;
 import uk.gov.justice.laa.access.datastore.entity.ApplicationHistoryEntity;
 import uk.gov.justice.laa.access.datastore.exception.ApplicationNotFoundException;
 import uk.gov.justice.laa.access.datastore.mapper.ApplicationMapper;
+import uk.gov.justice.laa.access.datastore.model.ActionType;
 import uk.gov.justice.laa.access.datastore.model.Application;
+import uk.gov.justice.laa.access.datastore.model.ApplicationHistoryEntry;
 import uk.gov.justice.laa.access.datastore.model.ApplicationHistoryMessage;
 import uk.gov.justice.laa.access.datastore.model.ApplicationHistoryRequestBody;
+import uk.gov.justice.laa.access.datastore.model.ApplicationProceeding;
 import uk.gov.justice.laa.access.datastore.model.ApplicationRequestBody;
+import uk.gov.justice.laa.access.datastore.model.ApplicationResourceType;
+import uk.gov.justice.laa.access.datastore.model.ApplicationUpdateRequestBody;
 import uk.gov.justice.laa.access.datastore.repository.ApplicationHistoryRepository;
 import uk.gov.justice.laa.access.datastore.repository.ApplicationRepository;
 
 /**
  * Service class for handling items requests.
  */
-@RequiredArgsConstructor
 @Service
 public class ApplicationService {
 
@@ -31,6 +53,26 @@ public class ApplicationService {
   private final ApplicationMapper applicationMapper;
 
   private final SqsProducer sqsProducer;
+
+  private final ObjectMapper objectMapper;
+
+  private final Javers javers;
+
+  public ApplicationService(
+      final ApplicationRepository applicationRepository,
+      final ApplicationHistoryRepository applicationHistoryRepository,
+      final ApplicationMapper applicationMapper,
+      final SqsProducer sqsProducer,
+      final ObjectMapper objectMapper) {
+    this.applicationRepository = applicationRepository;
+    this.applicationHistoryRepository = applicationHistoryRepository;
+    this.applicationMapper = applicationMapper;
+    this.sqsProducer = sqsProducer;
+    this.javers = JaversBuilder.javers().build();
+
+    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    this.objectMapper = objectMapper;
+  }
 
   /**
    * Gets all applications.
@@ -71,35 +113,158 @@ public class ApplicationService {
 
     applicationRepository.save(applicationEntity);
 
-    //create history message for the created application
-    ApplicationHistoryMessage historyMessage = ApplicationHistoryMessage.builder()
-        .userId(applicationEntity.getUpdatedBy())
-        .action(ApplicationHistoryMessage.ActionEnum.CREATED)
-        .resourceType(ApplicationHistoryMessage.ResourceTypeEnum.APPLICATION)
-        .resourceId(applicationEntity.getId())
-        .timestamp(applicationEntity.getCreatedAt().atOffset(ZoneOffset.UTC))
-        .build();
-    sqsProducer.createHistoricRecord(historyMessage);
+    // create history message for the created application
+    createAndSendHistoricRecord(applicationEntity, CREATED);
 
     return applicationEntity.getId();
   }
 
-  public UUID createApplicationHistory(UUID applicationId, ApplicationHistoryRequestBody applicationHistoryRequestBody) {
-    ApplicationEntity applicationEntity = checkIfApplicationExists(applicationId);
+  public void updateApplication(UUID id, ApplicationUpdateRequestBody requestBody) {
+    ApplicationEntity applicationEntity = checkIfApplicationExists(id);
 
-    //todo convert to mapper method
-    ApplicationHistoryEntity applicationHistoryEntity =
-        new ApplicationHistoryEntity();
+    applicationMapper.updateApplicationEntity(applicationEntity, requestBody);
+    if (applicationEntity.getProceedings() != null) {
+      applicationEntity.getProceedings().forEach(p -> p.setApplication(applicationEntity));
+    }
+
+    applicationRepository.save(applicationEntity);
+
+    Map<String, Object> snapshot =
+        objectMapper.convertValue(applicationMapper.toApplication(applicationEntity), new TypeReference<>() {});
+
+    ApplicationHistoryMessage message = ApplicationHistoryMessage.builder()
+        .userId(applicationEntity.getUpdatedBy())
+        .action(UPDATED)
+        .resourceTypeChanged(ApplicationResourceType.APPLICATION)
+        .applicationId(applicationEntity.getId())
+        .historicSnapshot(snapshot)
+        .timestamp(OffsetDateTime.now())
+        .build();
+
+    sqsProducer.createHistoricRecord(message);
+  }
+
+
+  /**
+   * Gets all history for an application.
+   *
+   * @return the list of history for an application
+   */
+  public List<ApplicationHistoryEntry> getAllApplicationHistory(UUID applicationId) {
+    return applicationHistoryRepository.findByApplicationId(applicationId)
+        .stream().map(applicationMapper::toApplicationHistoryEntry).toList();
+  }
+
+  protected void createAndSendHistoricRecord(ApplicationEntity applicationEntity, ActionType actionType) {
+    Map<String, Object> historicSnapshot =
+        objectMapper.convertValue(
+            applicationMapper.toApplication(applicationEntity),
+            new TypeReference<Map<String, Object>>() {});
+
+    ApplicationHistoryMessage historyMessage = ApplicationHistoryMessage.builder()
+        .userId(applicationEntity.getUpdatedBy())
+        .action(ActionType.CREATED)
+        .resourceTypeChanged(ApplicationResourceType.APPLICATION)
+        .applicationId(applicationEntity.getId())
+        .historicSnapshot(historicSnapshot)
+        .timestamp(applicationEntity.getCreatedAt().atOffset(ZoneOffset.UTC))
+        .build();
+
+    sqsProducer.createHistoricRecord(historyMessage);
+  }
+
+  public ApplicationHistoryEntry getApplicationsLatestHistory(UUID applicationId) {
+    checkIfApplicationExists(applicationId);
+
+    ApplicationHistoryEntity latestEntry = applicationHistoryRepository
+        .findFirstByApplicationIdOrderByTimestampDesc(applicationId)
+        .orElseThrow(() ->
+            new ApplicationNotFoundException("No history found for application id: " + applicationId));
+
+    return applicationMapper.toApplicationHistoryEntry(latestEntry);
+  }
+
+  public UUID createApplicationHistory(UUID applicationId, ApplicationHistoryRequestBody applicationHistoryRequestBody) {
+
+    ApplicationHistoryEntity applicationHistoryEntity = new ApplicationHistoryEntity();
 
     applicationHistoryEntity.setApplicationId(applicationId);
     applicationHistoryEntity.setUserId(applicationHistoryRequestBody.getUserId());
-    applicationHistoryEntity.setAction(applicationHistoryRequestBody.getAction());
-    applicationHistoryEntity.setResourceType(applicationHistoryRequestBody.getResourceType());
-    applicationHistoryEntity.setApplicationSnapshot(applicationHistoryRequestBody.getApplicationSnapshot());
+    applicationHistoryEntity.setAction(applicationHistoryRequestBody.getAction().getValue());
+    applicationHistoryEntity.setResourceTypeChanged(
+        applicationHistoryRequestBody.getResourceTypeChanged().getValue());
+    applicationHistoryEntity.setApplicationSnapshot(
+        applicationHistoryRequestBody.getHistoricSnapshot());
     applicationHistoryEntity.setTimestamp(applicationHistoryRequestBody.getTimestamp().toInstant());
 
+    if (applicationHistoryRequestBody.getResourceTypeChanged()
+        == ApplicationResourceType.APPLICATION) {
+      if (applicationHistoryRequestBody.getAction() == ActionType.CREATED) {
+        applicationHistoryEntity.setHistoricSnapshot(
+            applicationHistoryRequestBody.getHistoricSnapshot());
+
+      } else if (applicationHistoryRequestBody.getAction() == ActionType.UPDATED) {
+        ApplicationHistoryEntry currentApplicationHistory =
+            getApplicationsLatestHistory(applicationId);
+
+        Application oldVersion = objectMapper.convertValue(
+            currentApplicationHistory.getApplicationSnapshot(),
+            new TypeReference<>() {
+            }
+        );
+
+        Application newVersion = objectMapper.convertValue(
+            applicationHistoryRequestBody.getHistoricSnapshot(),
+            new TypeReference<>() {
+            }
+        );
+
+        Diff diff = javers.compare(oldVersion, newVersion);
+
+        Map<Object, Map<String, Object>> changesByObject = new LinkedHashMap<>();
+
+        Application applicationChanges = new Application();
+        List<ApplicationProceeding> updatedProceedings = new ArrayList<>();
+
+        for (ValueChange change : diff.getChangesByType(ValueChange.class)) {
+          if (change.getAffectedObject().isPresent()) {
+            Object cdo = change.getAffectedObject().get();
+
+            Map<String, Object> fields = changesByObject.computeIfAbsent(cdo, k -> new LinkedHashMap<>());
+            fields.put(change.getPropertyName(), change.getRight());
+
+            Object id = getObjectId(cdo);
+            if (id != null) {
+              fields.putIfAbsent("id", id);
+            }
+          }
+        }
+
+        // Now apply changes
+        for (Map.Entry<Object, Map<String, Object>> entry : changesByObject.entrySet()) {
+          Object target = entry.getKey();
+          Map<String, Object> fields = entry.getValue();
+
+          if (target instanceof Application) {
+            populateFields(applicationChanges, fields);
+          } else if (target instanceof ApplicationProceeding) {
+            ApplicationProceeding proceeding = new ApplicationProceeding();
+            populateFields(proceeding, fields);
+            updatedProceedings.add(proceeding);
+          }
+        }
+
+        if (!updatedProceedings.isEmpty()) {
+          applicationChanges.setProceedings(updatedProceedings);
+        }
+
+        // Convert to map for historic snapshot
+        Map<String, Object> snapshot = objectMapper.convertValue(applicationChanges, new TypeReference<>() {});
+        applicationHistoryEntity.setHistoricSnapshot(snapshot);
+      }
+    }
     applicationHistoryRepository.save(applicationHistoryEntity);
-    return applicationEntity.getId();
+    return applicationHistoryEntity.getId();
   }
 
   protected ApplicationEntity checkIfApplicationExists(UUID id) {
@@ -108,4 +273,34 @@ public class ApplicationService {
         .orElseThrow(
             () -> new ApplicationNotFoundException(String.format("No application found with id: %s", id)));
   }
+
+  protected ApplicationHistoryEntity checkIfApplicationHistoryExists(UUID id) {
+    return applicationHistoryRepository
+        .findById(id)
+        .orElseThrow(
+            () -> new ApplicationNotFoundException(String.format("No application history found with id: %s", id)));
+  }
+
+  private Object getObjectId(Object object) {
+    try {
+      Field idField = object.getClass().getDeclaredField("id");
+      idField.setAccessible(true);
+      return idField.get(object);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      return null;
+    }
+  }
+
+  public void populateFields(Object target, Map<String, Object> fieldValues) {
+    fieldValues.forEach((name, value) -> {
+      try {
+        Field field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(target, value);
+      } catch (NoSuchFieldException | IllegalAccessException e) {
+        // Optionally log or ignore unknown fields
+      }
+    });
+  }
+
 }

@@ -39,8 +39,8 @@ public class ApplicationHistoryEntity {
   @Column(name = "user_id", nullable = false)
   private String userId;
 
-  @Column(name = "resource_type", nullable = false)
-  private String resourceType;
+  @Column(name = "resource_type_changed", nullable = false)
+  private String resourceTypeChanged;
 
   @Column(name = "action", nullable = false)
   private String action;
@@ -48,6 +48,10 @@ public class ApplicationHistoryEntity {
   @CreatedDate
   @Column(name = "timestamp", nullable = false, updatable = false)
   private Instant timestamp;
+
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "historic_snapshot", columnDefinition = "jsonb", nullable = false)
+  private Map<String, Object> historicSnapshot;
 
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "application_snapshot", columnDefinition = "jsonb", nullable = false)

@@ -39,7 +39,7 @@ INSERT INTO application_history (
     application_id,
     user_id,
     action,
-    resource_type,
+    resource_type_changed,
     timestamp,
     application_snapshot
 ) VALUES (

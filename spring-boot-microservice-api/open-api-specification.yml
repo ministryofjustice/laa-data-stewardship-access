@@ -82,7 +82,7 @@ paths:
           description: 'Not found'
         '500':
           description: 'Internal server error'
-    put:
+    patch:
       tags:
         - applications
       summary: Update an application
@@ -100,7 +100,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationRequestBody'
+              $ref: '#/components/schemas/ApplicationUpdateRequestBody'
       responses:
         '204':
           description: No content
@@ -140,14 +140,15 @@ paths:
           description: 'Not found'
         '500':
           description: 'Internal server error'
-  /api/v1/applications/{id}/history:
+
+  /api/v1/applications/{application-id}/history:
     post:
       summary: Record an application history entry
       operationId: recordApplicationHistory
       tags:
-        - applications
+        - application-history
       parameters:
-        - name: id
+        - name: application-id
           in: path
           required: true
           description: The ID of the application the history relates to
@@ -178,9 +179,9 @@ paths:
       summary: Get history for an application
       operationId: getApplicationHistory
       tags:
-        - applications
+        - application-history
       parameters:
-        - name: id
+        - name: application-id
           in: path
           required: true
           description: The ID of the application
@@ -193,9 +194,76 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ApplicationHistoryEntry'
+                $ref: "#/components/schemas/ApplicationHistory"
+        '400':
+          description: 'Bad request'
+        '401':
+          description: 'Unauthorized'
+        '403':
+          description: 'Forbidden'
+        '404':
+          description: 'Not found'
+        '500':
+          description: 'Internal server error'
+  /api/v1/applications/{application-id}/history/{id}:
+    get:
+      summary: Get a specific history record for an application
+      operationId: getApplicationHistoryById
+      tags:
+        - application-history
+      parameters:
+        - name: application-id
+          in: path
+          required: true
+          description: The ID of the application
+          schema:
+            type: string
+            format: uuid
+        - name: id
+          in: path
+          required: true
+          description: The ID of the history record
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationHistoryEntry"
+        '400':
+          description: 'Bad request'
+        '401':
+          description: 'Unauthorized'
+        '403':
+          description: 'Forbidden'
+        '404':
+          description: 'Not found'
+        '500':
+          description: 'Internal server error'
+  /api/v1/applications/{application-id}/history/latest:
+    get:
+      summary: Get the latest history record for an application
+      operationId: getLatestApplicationHistory
+      tags:
+        - application-history
+      parameters:
+        - name: application-id
+          in: path
+          required: true
+          description: The ID of the application
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationHistoryEntry"
         '400':
           description: 'Bad request'
         '401':
@@ -261,11 +329,26 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ApplicationProceedingRequestBody"
+    ApplicationUpdateRequestBody:
+      properties:
+        provider_firm_id:
+          type: string
+        provider_office_id:
+          type: string
+        client_id:
+          type: string
+          format: uuid
+        status_code:
+          type: string
+        statement_of_case:
+          type: string
+        is_emergency_application:
+          type: boolean
+        proceedings:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationProceedingUpdateRequestBody"
     ApplicationProceeding:
-      required:
-        - id
-        - application_id
-        - proceeding_type
       properties:
         id:
           type: string
@@ -278,29 +361,39 @@ components:
         - $ref: "#/components/schemas/recordHistory"
     ApplicationProceedingRequestBody:
       required:
-        - application_id
-        - proceeding_type
+        - proceeding_code
       properties:
+        proceeding_code:
+          type: string
+        level_of_service_code:
+          type: string
+    ApplicationProceedingUpdateRequestBody:
+      required:
+        - proceeding_code
+      properties:
+        id:
+          type: string
+          format: uuid
         proceeding_code:
           type: string
         level_of_service_code:
           type: string
     recordHistory:
       required:
-        - createdAt
-        - createdBy
-        - updatedAt
-        - updatedBy
+        - created_at
+        - created_by
+        - updated_at
+        - updated_by
       properties:
-        createdAt:
+        created_at:
           type: string
           format: date-time
-        createdBy:
+        created_by:
           type: string
-        updatedAt:
+        updated_at:
           type: string
           format: date-time
-        updatedBy:
+        updated_by:
           type: string
 
     Applications:
@@ -312,59 +405,67 @@ components:
       required:
         - user_id
         - action
+        - resource_type_changed
+        - historic_snapshot
         - timestamp
-        - application_snapshot
       properties:
         user_id:
           type: string
         action:
-          type: string
-          description: A description or enum of the action performed (e.g., CREATED, UPDATED, DELETED)
-        resource_type:
-          type: string
-          description: The type of resource (e.g., APPLICATION, PROCEEDING)
-        timestamp:
-          type: string
-          format: date-time
-        application_snapshot:
+          $ref: "#/components/schemas/ActionType"
+        resource_type_changed:
+          $ref: "#/components/schemas/ApplicationResourceType"
+        historic_snapshot:
           type: object
           additionalProperties: true
-          description: A JSON representation of the application at the time of the action
-    ApplicationHistoryMessage:
-      required:
-        - user_id
-        - action
-        - resource_type
-        - resource_id
-        - timestamp
-      properties:
-        user_id:
-          type: string
-        action:
-          type: string
-          description: A description or enum of the action performed (e.g., CREATED, UPDATED, DELETED)
-          enum:
-            - CREATED
-            - UPDATED
-            - DELETED
-        resource_type:
-          type: string
-          description: The type of resource (e.g., APPLICATION, PROCEEDING)
-          enum:
-            - APPLICATION
-            - PROCEEDING
-        resource_id:
-          type: string
-          format: uuid
+          description: A JSON representation of the change made to the resource
         timestamp:
           type: string
           format: date-time
+    ApplicationHistoryMessage:
+      allOf:
+        - $ref: "#/components/schemas/ApplicationHistoryRequestBody"
+      required:
+        - user_id
+        - application_id
+        - action
+        - resource_type_changed
+        - historic_snapshot
+        - timestamp
+      properties:
+        application_id:
+          type: string
+          format: uuid
 
     ApplicationHistoryEntry:
       allOf:
-        - $ref: "#/components/schemas/ApplicationHistoryRequestBody"
+        - $ref: "#/components/schemas/ApplicationHistoryMessage"
         - type: object
           properties:
             id:
               type: string
               format: uuid
+            application_snapshot:
+              type: object
+              additionalProperties: true
+              description: A JSON representation of the application at the time of the action
+    ApplicationHistory:
+      type: array
+      items:
+        $ref: "#/components/schemas/ApplicationHistoryEntry"
+
+
+    ApplicationResourceType:
+      type: string
+      description: The type of resource (e.g., APPLICATION, PROCEEDING)
+      enum:
+        - APPLICATION
+        - PROCEEDING
+        - LIABLE_PARTY
+    ActionType:
+      type: string
+      description: The type of action performed (e.g., CREATED, UPDATED, DELETED)
+      enum:
+        - CREATED
+        - UPDATED
+        - DELETED

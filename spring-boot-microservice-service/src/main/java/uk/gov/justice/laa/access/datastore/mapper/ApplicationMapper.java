@@ -1,15 +1,22 @@
 package uk.gov.justice.laa.access.datastore.mapper;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import uk.gov.justice.laa.access.datastore.entity.ApplicationEntity;
-import uk.gov.justice.laa.access.datastore.entity.ApplicationProceedingEntity;
+import uk.gov.justice.laa.access.datastore.entity.ApplicationHistoryEntity;
 import uk.gov.justice.laa.access.datastore.model.Application;
-import java.util.Date;
+import uk.gov.justice.laa.access.datastore.model.ApplicationHistoryEntry;
+import uk.gov.justice.laa.access.datastore.model.ApplicationProceeding;
+import uk.gov.justice.laa.access.datastore.model.ApplicationProceedingRequestBody;
 import uk.gov.justice.laa.access.datastore.model.ApplicationRequestBody;
+import uk.gov.justice.laa.access.datastore.model.ApplicationUpdateRequestBody;
 
 /**
  * The mapper between Application and ApplicationEntity.
@@ -35,13 +42,26 @@ public interface ApplicationMapper {
   @Mapping(target = "recordHistory", ignore = true)
   ApplicationEntity toApplicationEntity(ApplicationRequestBody applicationRequestBody);
 
-//  ApplicationProceedingEntity toApplicationProceedingEntity(ApplicationRequestBody applicationRequestBody);
+  /**
+   * Maps the given application request to an application entity.
+   *
+   * @param applicationEntity the application entity
+   * @param applicationUpdateRequestBody the application update request
+   */
+  @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
+  void updateApplicationEntity(
+      @MappingTarget ApplicationEntity applicationEntity,
+      ApplicationUpdateRequestBody applicationUpdateRequestBody);
 
-  default OffsetDateTime toOffsetDateTime(Date date) {
-    return date == null ? null : date.toInstant().atOffset(ZoneOffset.UTC);
-  }
+  @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
+  void updateApplicationEntity(
+      @MappingTarget Application application,
+      ApplicationUpdateRequestBody applicationUpdateRequestBody);
 
-  default Date toDate(OffsetDateTime dateTime) {
-    return dateTime == null ? null : Date.from(dateTime.toInstant());
+  ApplicationHistoryEntry toApplicationHistoryEntry(
+      ApplicationHistoryEntity applicationHistoryEntity);
+
+  default OffsetDateTime toOffsetDateTime(Instant instant) {
+    return instant == null ? null : instant.atOffset(ZoneOffset.UTC);
   }
 }

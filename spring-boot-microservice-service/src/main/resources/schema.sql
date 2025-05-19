@@ -38,9 +38,10 @@ CREATE TABLE application_history (
      id UUID PRIMARY KEY,
      application_id UUID NOT NULL,
      user_id VARCHAR(255) NOT NULL,
-     resource_type VARCHAR(100) NOT NULL,
+     resource_type_changed VARCHAR(100) NOT NULL,
      action VARCHAR(100) NOT NULL,
      timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     historic_snapshot JSONB NOT NULL,
      application_snapshot JSONB NOT NULL,
 
      CONSTRAINT fk_application_history_application FOREIGN KEY (application_id)
