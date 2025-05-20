@@ -19,6 +19,9 @@ import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+/**
+ * Represents the historical changes to an application for legal aid.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

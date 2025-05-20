@@ -8,9 +8,17 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
+/**
+ * Spring config class to provide injectable client for Amazon SQS.
+ */
 @Configuration
 public class SqsConfig {
 
+  /**
+   * Provides an injectable queue client.
+   *
+   * @return the queue client.
+   */
   @Bean
   public SqsAsyncClient sqsAsyncClient() {
     return SqsAsyncClient.builder()

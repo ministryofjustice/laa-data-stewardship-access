@@ -58,6 +58,15 @@ public class ApplicationService {
 
   private final Javers javers;
 
+  /**
+   * Create a service for applications for legal aid.
+   *
+   * @param applicationRepository the repository of such applications.
+   * @param applicationHistoryRepository the repository of the history of applications.
+   * @param applicationMapper the mapper between entity and DTO.
+   * @param sqsProducer the sender of messages to the queue.
+   * @param objectMapper JSON mapper to serialize the history.
+   */
   public ApplicationService(
       final ApplicationRepository applicationRepository,
       final ApplicationHistoryRepository applicationHistoryRepository,
@@ -105,7 +114,7 @@ public class ApplicationService {
         applicationMapper.toApplicationEntity(applicationRequestBody);
 
     //set the application entity id to null to ensure a new entity is created
-    if (applicationEntity.getProceedings() != null){
+    if (applicationEntity.getProceedings() != null) {
       applicationEntity.getProceedings().forEach(proceeding -> {
         proceeding.setApplication(applicationEntity);
       });
@@ -119,6 +128,12 @@ public class ApplicationService {
     return applicationEntity.getId();
   }
 
+  /**
+   * Update an application for legal aid, keeping history.
+   *
+   * @param id the unique identifier of the application.
+   * @param requestBody the DTO containing the change.
+   */
   public void updateApplication(UUID id, ApplicationUpdateRequestBody requestBody) {
     ApplicationEntity applicationEntity = checkIfApplicationExists(id);
 
@@ -173,6 +188,12 @@ public class ApplicationService {
     sqsProducer.createHistoricRecord(historyMessage);
   }
 
+  /**
+   * Get latest history for an application.
+   *
+   * @param applicationId unique identifier of the application.
+   * @return the latest history for the application.
+   */
   public ApplicationHistoryEntry getApplicationsLatestHistory(UUID applicationId) {
     checkIfApplicationExists(applicationId);
 
@@ -184,6 +205,13 @@ public class ApplicationService {
     return applicationMapper.toApplicationHistoryEntry(latestEntry);
   }
 
+  /**
+   * Create a history record for an application.
+   *
+   * @param applicationId unique identifier of the application.
+   * @param applicationHistoryRequestBody the DTO containing the history.
+   * @return a unique identifier for the history.
+   */
   public UUID createApplicationHistory(UUID applicationId, ApplicationHistoryRequestBody applicationHistoryRequestBody) {
 
     ApplicationHistoryEntity applicationHistoryEntity = new ApplicationHistoryEntity();
@@ -291,7 +319,7 @@ public class ApplicationService {
     }
   }
 
-  public void populateFields(Object target, Map<String, Object> fieldValues) {
+  private void populateFields(Object target, Map<String, Object> fieldValues) {
     fieldValues.forEach((name, value) -> {
       try {
         Field field = target.getClass().getDeclaredField(name);

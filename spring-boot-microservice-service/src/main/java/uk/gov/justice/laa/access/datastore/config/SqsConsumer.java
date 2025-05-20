@@ -8,6 +8,9 @@ import uk.gov.justice.laa.access.datastore.model.ApplicationHistoryMessage;
 import uk.gov.justice.laa.access.datastore.model.ApplicationHistoryRequestBody;
 import uk.gov.justice.laa.access.datastore.service.ApplicationService;
 
+/**
+ * Consumes messages from a queue.
+ */
 @Component
 @RequiredArgsConstructor
 public class SqsConsumer {
@@ -15,6 +18,11 @@ public class SqsConsumer {
   private final ObjectMapper objectMapper;
   private final ApplicationService applicationService;
 
+  /**
+   * Message listener for the SQS queue.
+   *
+   * @param message the message being received.
+   */
   @SqsListener("test-queue")
   public void receiveMessage(String message) {
     try {

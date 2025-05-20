@@ -11,6 +11,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
+/**
+ * Represents the common audit fields in entities.
+ */
 @Embeddable
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)

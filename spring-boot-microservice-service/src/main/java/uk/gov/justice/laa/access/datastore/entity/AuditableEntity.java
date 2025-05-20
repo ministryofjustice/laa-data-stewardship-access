@@ -8,7 +8,10 @@ import java.time.Instant;
  */
 public interface AuditableEntity {
   Instant getCreatedAt();
+
   String getCreatedBy();
+
   Instant getUpdatedAt();
+
   String getUpdatedBy();
 }

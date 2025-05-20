@@ -10,11 +10,19 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
+/**
+ * AspectJ implementation for @LogMethodArguments.
+ */
 @Aspect
 @Component
 @Slf4j
 public class LoggingAspects {
 
+  /**
+   * Before advice for @LogMethodArguments aspect.
+   *
+   * @param joinPoint AspectJ-provided join point.
+   */
   @Before("@annotation(uk.gov.justice.laa.access.datastore.common.logging.aspects.LogMethodArguments)")
   public void logMethodArgumentsAdvice(JoinPoint joinPoint) {
     if (log.isInfoEnabled()) {
@@ -30,6 +38,12 @@ public class LoggingAspects {
     }
   }
 
+  /**
+   * After returning advice for @LogMethodArguments aspect.
+   *
+   * @param joinPoint AspectJ-provided join point.
+   * @param methodResponse the returned value.
+   */
   @AfterReturning(
       value = "@annotation(uk.gov.justice.laa.access.datastore.common.logging.aspects.LogMethodResponse)",
       returning = "methodResponse")

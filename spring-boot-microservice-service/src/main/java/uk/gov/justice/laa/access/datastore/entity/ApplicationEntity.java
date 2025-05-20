@@ -22,6 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+/**
+ * Represents an application for legal aid.
+ */
 @Getter
 @Setter
 @RequiredArgsConstructor

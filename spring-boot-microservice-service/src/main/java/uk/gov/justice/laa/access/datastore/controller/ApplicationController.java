@@ -62,8 +62,8 @@ public class ApplicationController implements ApplicationsApi {
   @LogMethodResponse
   @LogMethodArguments
   public ResponseEntity<Void> deleteApplication(UUID id) {
-//    service.deleteItem(id);
-//    return ResponseEntity.noContent().build();
+    //service.deleteItem(id);
+    //return ResponseEntity.noContent().build();
     return null;
   }
 
