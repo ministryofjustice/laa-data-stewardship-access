@@ -1,0 +1,13 @@
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "gradle" # See documentation for possible values
+    directories: [ "/", "/laa-datastore-common", "/spring-boot-microservice-api", "/spring-boot-microservice-service" ] # Location of package manifests
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
