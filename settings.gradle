@@ -17,9 +17,9 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'laa-spring-boot-microservice-template'
+rootProject.name = 'laa-access-data-stewardship-api'
 
-include 'spring-boot-microservice-api'
-include 'spring-boot-microservice-service'
-include 'laa-datastore-common'
+include 'access-datastore-api'
+include 'access-datastore-service'
+include 'access-datastore-common'
 
