@@ -1,17 +1,18 @@
 plugins {
     id 'io.freefair.lombok' version '8.13'
+    id "com.gorylenko.gradle-git-properties" version "2.4.1"
     id 'uk.gov.laa.ccms.springboot.laa-ccms-spring-boot-gradle-plugin'
 }
 
 test {
     useJUnitPlatform()
-    finalizedBy jacocoTestReport
+    finalizedBy(jacocoTestReport)
 }
 
 jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['**/SpringBootMicroserviceApplication.class'])
+            fileTree(dir: it, exclude: ['**/AccessDatastoreApplication.class'])
         }))
     }
 }
@@ -19,7 +20,7 @@ jacocoTestReport {
 jacocoTestCoverageVerification {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['**/SpringBootMicroserviceApplication.class'])
+            fileTree(dir: it, exclude: ['**/AccessDatastoreApplication.class'])
         }))
     }
 }

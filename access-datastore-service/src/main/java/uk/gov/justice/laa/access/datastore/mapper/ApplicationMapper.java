@@ -15,6 +15,7 @@ import uk.gov.justice.laa.access.datastore.model.Application;
 import uk.gov.justice.laa.access.datastore.model.ApplicationHistoryEntry;
 import uk.gov.justice.laa.access.datastore.model.ApplicationProceeding;
 import uk.gov.justice.laa.access.datastore.model.ApplicationProceedingRequestBody;
+import uk.gov.justice.laa.access.datastore.model.ApplicationProceedingUpdateRequestBody;
 import uk.gov.justice.laa.access.datastore.model.ApplicationRequestBody;
 import uk.gov.justice.laa.access.datastore.model.ApplicationUpdateRequestBody;
 
@@ -39,6 +40,7 @@ public interface ApplicationMapper {
    * @return the application entity
    */
   @Mapping(target = "id", ignore = true)
+  @Mapping(target = "proceedings", ignore = true)
   @Mapping(target = "recordHistory", ignore = true)
   ApplicationEntity toApplicationEntity(ApplicationRequestBody applicationRequestBody);
 
@@ -49,14 +51,32 @@ public interface ApplicationMapper {
    * @param applicationUpdateRequestBody the application update request
    */
   @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "proceedings", ignore = true)
+  @Mapping(target = "recordHistory", ignore = true)
   void updateApplicationEntity(
       @MappingTarget ApplicationEntity applicationEntity,
       ApplicationUpdateRequestBody applicationUpdateRequestBody);
 
   @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "createdBy", ignore = true)
+  @Mapping(target = "updatedAt", ignore = true)
+  @Mapping(target = "updatedBy", ignore = true)
   void updateApplicationEntity(
       @MappingTarget Application application,
       ApplicationUpdateRequestBody applicationUpdateRequestBody);
+
+  /**
+   * This mapping exists solely so we can declare the ignored fields, to avoid a warning on the
+   * updateApplicationEntity mapping method which targets an Application instance.
+   */
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "createdBy", ignore = true)
+  @Mapping(target = "updatedAt", ignore = true)
+  @Mapping(target = "updatedBy", ignore = true)
+  ApplicationProceeding toApplicationProceeding(ApplicationProceedingUpdateRequestBody applicationProceedingUpdateRequestBody);
 
   ApplicationHistoryEntry toApplicationHistoryEntry(
       ApplicationHistoryEntity applicationHistoryEntity);
