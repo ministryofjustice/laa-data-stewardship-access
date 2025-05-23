@@ -25,8 +25,8 @@ jacocoTestCoverageVerification {
 }
 
 dependencies {
-    implementation project(':spring-boot-microservice-api')
-    implementation project(':laa-datastore-common')
+    implementation project(':access-datastore-api')
+    implementation project(':access-datastore-common')
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

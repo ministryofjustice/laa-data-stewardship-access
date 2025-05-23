@@ -2,20 +2,46 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
+
+# Receive dependabot updates for 'laa-ccms-spring-boot-common'.
+registries:
+  spring-boot-common-github-packages:
+    type: maven-repository
+    url: https://maven.pkg.github.com/ministryofjustice/laa-ccms-spring-boot-common
+    username: ${{ github.actor }}
+    password: ${{ secrets.GITHUB_TOKEN }}
+
 updates:
   - package-ecosystem: "gradle" # See documentation for possible values
-    directories: [ "/", "/laa-datastore-common", "/spring-boot-microservice-api", "/spring-boot-microservice-service" ] # Location of package manifests
+    directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      gradle-updates:
+        exclude-patterns: [ "uk.gov.justice.laa.access.datastore.*" ]
+      internal-updates:
+        patterns: [ "uk.gov.justice.laa.access.datastore*" ]
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      github-actions-updates:
+        patterns: [ "**" ]
+
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      dockerfile-updates:
+        patterns: [ "**" ]
+
   - package-ecosystem: "docker-compose"
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      docker-compose-updates:
+        patterns: [ "**" ]
