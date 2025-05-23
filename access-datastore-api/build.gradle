@@ -18,7 +18,7 @@ dependencies {
 
 sourceSets.main.java.srcDirs += ['generated/src/main/java']
 
-checkstyleMain.exclude "*"
+checkstyleMain.exclude("*")
 
 openApiGenerate {
     generatorName = "spring"
@@ -38,10 +38,10 @@ openApiGenerate {
     ]
 }
 
-compileJava.dependsOn 'openApiGenerate'
+compileJava.dependsOn('openApiGenerate')
 
 clean {
-    delete "$rootDir/access-datastore-api/generated"
+    delete("$rootDir/access-datastore-api/generated")
 }
 
 // disable for overall project when running a build
