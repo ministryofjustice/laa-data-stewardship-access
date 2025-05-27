@@ -15,7 +15,7 @@ runs:
   steps:
     - name: Gradle build
       id: build_and_test
-      run: ./gradlew build
+      run: ./gradlew clean build
       env:
         GITHUB_ACTOR: ${{ inputs.user}}
         GITHUB_TOKEN: ${{ inputs.token }}
