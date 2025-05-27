@@ -32,5 +32,12 @@ jobs:
         with:
           token: ${{ secrets.SNYK_TOKEN }}
 
+#      - name: Create Docker image
+#        uses: ./.github/actions/publish
+#        with:
+#          registry: ${{ inputs.environment }}
+#          repository: ${{ inputs.dockerfile_path }}
+#          tag: ${{ inputs.image_tag }}
+
       - name: Post Setup Containers
         run: docker compose down

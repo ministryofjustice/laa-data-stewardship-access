@@ -1,0 +1,28 @@
+name: Build and push Docker image to container repository
+description: Build Docker image and publish it
+
+inputs:
+  registry:
+    required: true
+    description: "registry name"
+
+  repository:
+    required: true
+    description: "repository location"
+
+  tag:
+    required: true
+    description: "Image tag"
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: build docker
+      id: build_docker
+      run: |
+        docker build -t ${{ inputs.registry }}/${{ inputs.repository }}:${{ inputs.tag }} .
+        docker push ${{ inputs.registry }}/${{ inputs.repository }}:${{ inputs.tag }}
+      shell:
+        bash
+
