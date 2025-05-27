@@ -12,7 +12,7 @@ runs:
       uses: snyk/actions/setup@master
 
     - name: Run Snyk scan
-      run: snyk test -d --all-projects --severity-threshold=high --sarif-file-output=snyk.sarif --exclude=access-datastore-api/generated
+      run: snyk test -d --all-projects --severity-threshold=high --sarif-file-output=snyk.sarif --exclude=pom.xml
       env:
         SNYK_TOKEN: ${{ inputs.token }}
       shell: bash
