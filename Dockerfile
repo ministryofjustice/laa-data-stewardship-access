@@ -2,11 +2,11 @@
 FROM amazoncorretto:21-alpine
 
 # Set up working directory in the container
-RUN mkdir -p /opt/laa-access-data-stewardship-api/
-WORKDIR /opt/laa-access-data-stewardship-api/
+RUN mkdir -p /opt/laa-data-stewardship-access/
+WORKDIR /opt/laa-data-stewardship-access/
 
 # Copy the JAR file into the container
-COPY access-datastore-service/build/libs/access-datastore-service-1.0.0.jar app.jar
+COPY dstew-access-service/build/libs/dstew-access-service-1.0.0.jar app.jar
 
 # Create a group and non-root user
 RUN addgroup -S appgroup && adduser -u 1001 -S appuser -G appgroup

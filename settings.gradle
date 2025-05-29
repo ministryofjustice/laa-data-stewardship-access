@@ -17,9 +17,8 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'laa-access-data-stewardship-api'
+rootProject.name = 'laa-data-stewardship-access'
 
-include 'access-datastore-api'
-include 'access-datastore-service'
-include 'access-datastore-common'
-
+include 'dstew-access-api'
+include 'dstew-access-service'
+include 'dstew-access-shared'

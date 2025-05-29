@@ -2,7 +2,7 @@
 
 ## Overview
 
-Source code for LAA Digital's Access Datastore API, owned by the Access Data Stewardship team.
+Source code for LAA Digital's Access Data Stewardship API, owned by the Access Data Stewardship team.
 
 This API will provide a trusted API source of truth for the Civil Applications and Civil Decide projects for data
 related to applications, proceedings, delegated functions, scope limitations, cost limitations and level of service.
@@ -10,10 +10,10 @@ related to applications, proceedings, delegated functions, scope limitations, co
 ### Project structure
 Includes the following subprojects:
 
-- `access-datastore-common` - common Java classes packaged into a library to avoid unexpected dependencies - can depend
+- `dstew-access-shared` - common Java classes packaged into a library to avoid unexpected dependencies - can depend
   on Spring Web, but must not depend on Spring Data (nor any database code)
-- `access-datastore-api` - OpenAPI specification used for generating API stub interfaces and documentation.
-- `access-datastore-service` - example REST API service with CRUD operations interfacing a JPA repository with PostgreSQL.
+- `dstew-access-api` - OpenAPI specification used for generating API stub interfaces and documentation.
+- `dstew-access-service` - example REST API service with CRUD operations interfacing a JPA repository with PostgreSQL.
 
 ### To do items
 - Continue to update this `README.md` file to include information such as what this project does.

@@ -18,9 +18,9 @@ updates:
       interval: "weekly"
     groups:
       gradle-updates:
-        exclude-patterns: [ "uk.gov.justice.laa.access.datastore.*" ]
+        exclude-patterns: [ "uk.gov.justice.laa.dstew.access.*" ]
       internal-updates:
-        patterns: [ "uk.gov.justice.laa.access.datastore*" ]
+        patterns: [ "uk.gov.justice.laa.dstew.access*" ]
 
   - package-ecosystem: "github-actions"
     directory: "/"
