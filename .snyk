@@ -1,0 +1,12 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.1
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  SNYK-JAVA-COMMONSBEANUTILS-10259368:
+    - '*':
+        reason: >-
+          commons-beansutil is only used by Checkstyle plugin and is not part of
+          the built artifact
+        expires: 2025-06-28T16:12:59.422Z
+        created: 2025-05-29T16:12:59.424Z
+patch: {}
