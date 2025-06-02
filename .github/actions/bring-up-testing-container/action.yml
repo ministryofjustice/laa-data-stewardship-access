@@ -1,0 +1,9 @@
+name: "Run the Postgres testing container"
+
+runs:
+  using: "composite"
+  steps:
+    - name: docker compose up
+      id: docker-compose-up
+      shell: bash
+      run: docker compose up -d
