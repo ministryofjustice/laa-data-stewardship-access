@@ -6,6 +6,9 @@ on:
       - main
         
 jobs:
+  setup-containers:
+    run: docker compose up -d
+
   build-and-publish-snapshot:
     uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v1
     permissions:
