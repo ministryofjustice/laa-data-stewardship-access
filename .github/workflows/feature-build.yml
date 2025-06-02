@@ -37,7 +37,7 @@ jobs:
         with:
           registry: ${{ secrets.ECR_REGISTRY_URL }}
           repository: ${{ env.ECR_REPOSITORY }}
-          tag: ${{ env.image_tag }}
+          tag: ${{ github.sha }}
 
       - name: Post Setup Containers
         run: docker compose down
