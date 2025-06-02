@@ -7,7 +7,7 @@ on:
         
 jobs:
   setup-containers:
-    uses: ./.github/actions/bring-up-testing-container/action.yml@v1
+    uses: ./.github/workflows/bring-up-testing-container.yml
 
   build-and-publish-snapshot:
     uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v1
