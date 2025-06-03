@@ -121,12 +121,12 @@ public class ApplicationService {
       });
     }
 
-    applicationRepository.save(applicationEntity);
+    var savedEntity = applicationRepository.save(applicationEntity);
 
     // create history message for the created application
-    createAndSendHistoricRecord(applicationEntity, CREATED);
+    createAndSendHistoricRecord(savedEntity, CREATED);
 
-    return applicationEntity.getId();
+    return savedEntity.getId();
   }
 
   /**

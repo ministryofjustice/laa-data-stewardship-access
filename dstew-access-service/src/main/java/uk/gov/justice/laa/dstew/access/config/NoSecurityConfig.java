@@ -21,7 +21,7 @@ class NoSecurityConfig {
    * @throws Exception if anything went wrong.
    */
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
     http
             .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
             .csrf(AbstractHttpConfigurer::disable);

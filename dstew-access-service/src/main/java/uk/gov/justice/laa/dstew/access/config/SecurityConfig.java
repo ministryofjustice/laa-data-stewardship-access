@@ -19,7 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
-public class SecurityConfig {
+class SecurityConfig {
   /**
    * Return the security filter chain.
    *
@@ -28,7 +28,7 @@ public class SecurityConfig {
    * @throws Exception if anything went wrong.
    */
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
     http
             .with(AadResourceServerHttpSecurityConfigurer.aadResourceServer(), withDefaults())
             .authorizeHttpRequests(authorize -> authorize

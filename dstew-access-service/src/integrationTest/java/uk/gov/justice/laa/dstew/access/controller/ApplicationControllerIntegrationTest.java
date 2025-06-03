@@ -3,8 +3,8 @@ package uk.gov.justice.laa.dstew.access.controller;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.dstew.access.AccessApplication;
 
-@SpringBootTest(classes = AccessApplication.class)
+@SpringBootTest(classes = AccessApplication.class, properties = "spring.cloud.azure.active-directory.enabled=false")
 @AutoConfigureMockMvc
 @Transactional
 public class ApplicationControllerIntegrationTest {
@@ -29,29 +29,30 @@ public class ApplicationControllerIntegrationTest {
   @Test
   void shouldGetAllItems() throws Exception {
     mockMvc
-        .perform(get("/api/v1/items"))
+        .perform(get("/api/v1/applications"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.*", hasSize(5)));
+        .andExpect(jsonPath("$.*", hasSize(1)));
   }
 
   @Test
   void shouldGetItem() throws Exception {
-    mockMvc.perform(get("/api/v1/items/1"))
+    mockMvc.perform(get("/api/v1/applications/123e4567-e89b-12d3-a456-426614174000"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.name").value("Item One"))
-        .andExpect(jsonPath("$.description").value("This is a description of Item One."));
+        .andExpect(jsonPath("$.id").value("123e4567-e89b-12d3-a456-426614174000"))
+        .andExpect(jsonPath("$.client_id").isNotEmpty())
+        .andExpect(jsonPath("$.statement_of_case").isNotEmpty());
   }
 
   @Test
   void shouldCreateItem() throws Exception {
     mockMvc
         .perform(
-            post("/api/v1/items")
+            post("/api/v1/applications")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"Item Six\", \"description\": \"This is a description of Item Six.\"}")
+                .content("{\"provider_firm_id\": \"firm-002\", \"provider_office_id\": \"office-201\"," +
+                         " \"client_id\": \"345e6789-eabb-34d5-a678-426614174333\"}")
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated());
   }
@@ -60,15 +61,15 @@ public class ApplicationControllerIntegrationTest {
   void shouldUpdateItem() throws Exception {
     mockMvc
         .perform(
-            put("/api/v1/items/2")
+            patch("/api/v1/applications/123e4567-e89b-12d3-a456-426614174000")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"id\": 2, \"name\": \"Item Two\", \"description\": \"This is a updated description of Item Three.\"}")
+                .content("{\"status_code\": \"IN_PROGRESS\"}")
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
   }
 
   @Test
   void shouldDeleteItem() throws Exception {
-    mockMvc.perform(delete("/api/v1/items/3")).andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/v1/applications/345e6789-eabb-34d5-a678-426614174333")).andExpect(status().isNoContent());
   }
 }
