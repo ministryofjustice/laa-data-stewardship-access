@@ -12,6 +12,7 @@ dstew-access-api/generated
 *.iws
 *.iml
 *.ipr
+*.run.xml
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/

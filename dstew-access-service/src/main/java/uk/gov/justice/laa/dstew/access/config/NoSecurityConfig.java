@@ -1,0 +1,30 @@
+package uk.gov.justice.laa.dstew.access.config;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
+
+/**
+ * Spring Security configuration if security is disabled (e.g. for development).
+ */
+@ConditionalOnProperty(name = "spring.cloud.azure.active-directory.enabled", havingValue = "false")
+@Configuration
+class NoSecurityConfig {
+  /**
+   * Return the security filter chain.
+   *
+   * @param http Used to configure web security.
+   * @return The built security configuration.
+   * @throws Exception if anything went wrong.
+   */
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+            .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+            .csrf(AbstractHttpConfigurer::disable);
+    return http.build();
+  }
+}

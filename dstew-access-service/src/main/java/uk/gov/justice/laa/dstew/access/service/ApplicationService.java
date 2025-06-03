@@ -18,6 +18,8 @@ import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.dstew.access.config.SqsProducer;
 import uk.gov.justice.laa.dstew.access.entity.ApplicationEntity;
@@ -84,6 +86,7 @@ public class ApplicationService {
    *
    * @return the list of applications
    */
+  @PreAuthorize("hasAuthority('SCOPE_Application.Read') or hasAuthority('APPROLE_ApplicationReader')")
   public List<Application> getAllApplications() {
     return applicationRepository.findAll().stream().map(applicationMapper::toApplication).toList();
   }
@@ -94,6 +97,7 @@ public class ApplicationService {
    * @param id the application id
    * @return the requested application
    */
+  @PreAuthorize("hasAuthority('SCOPE_Application.Read') or hasAuthority('APPROLE_ApplicationReader')")
   public Application getApplication(UUID id) {
     ApplicationEntity applicationEntity = checkIfApplicationExists(id);
     return applicationMapper.toApplication(applicationEntity);
@@ -105,6 +109,7 @@ public class ApplicationService {
    * @param applicationRequestBody the application to be created
    * @return the id of the created application
    */
+  @PreAuthorize("hasAuthority('SCOPE_Application.Write') or hasAuthority('APPROLE_ApplicationWriter')")
   public UUID createApplication(ApplicationRequestBody applicationRequestBody) {
     ApplicationEntity applicationEntity =
         applicationMapper.toApplicationEntity(applicationRequestBody);
@@ -130,6 +135,7 @@ public class ApplicationService {
    * @param id the unique identifier of the application.
    * @param requestBody the DTO containing the change.
    */
+  @PreAuthorize("hasAuthority('SCOPE_Application.Write') or hasAuthority('APPROLE_ApplicationWriter')")
   public void updateApplication(UUID id, ApplicationUpdateRequestBody requestBody) {
     ApplicationEntity applicationEntity = checkIfApplicationExists(id);
 
@@ -161,6 +167,7 @@ public class ApplicationService {
    *
    * @return the list of history for an application
    */
+  @PreAuthorize("hasAuthority('SCOPE_Application.Read') or hasAuthority('APPROLE_ApplicationReader')")
   public List<ApplicationHistoryEntry> getAllApplicationHistory(UUID applicationId) {
     return applicationHistoryRepository.findByApplicationId(applicationId)
         .stream().map(applicationMapper::toApplicationHistoryEntry).toList();
@@ -190,6 +197,7 @@ public class ApplicationService {
    * @param applicationId unique identifier of the application.
    * @return the latest history for the application.
    */
+  @PreAuthorize("hasAuthority('SCOPE_Application.Read') or hasAuthority('APPROLE_ApplicationReader')")
   public ApplicationHistoryEntry getApplicationsLatestHistory(UUID applicationId) {
     checkIfApplicationExists(applicationId);
 
@@ -208,6 +216,7 @@ public class ApplicationService {
    * @param applicationHistoryRequestBody the DTO containing the history.
    * @return a unique identifier for the history.
    */
+  @PreAuthorize("hasAuthority('SCOPE_Application.Write') or hasAuthority('APPROLE_ApplicationWriter')")
   public UUID createApplicationHistory(UUID applicationId, ApplicationHistoryRequestBody applicationHistoryRequestBody) {
 
     ApplicationHistoryEntity applicationHistoryEntity = new ApplicationHistoryEntity();
