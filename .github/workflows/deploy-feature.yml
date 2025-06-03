@@ -1,10 +1,10 @@
 name: Deploy feature
 
 on:
-  push:
-    branches:
-      - 'feature-dev/**'
-      - 'feature-test/**'
+  workflow_run:
+    workflows: [Build feature]
+    types:
+      - completed
 
 permissions:
   contents: read
