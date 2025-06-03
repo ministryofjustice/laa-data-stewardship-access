@@ -18,6 +18,7 @@ jobs:
       junit_results_path: 'data-service/build/test-results'
       junit_report_path: 'data-service/build/reports/tests'
       checkstyle_report_path: 'data-service/build/reports/checkstyle'
+      jacoco_coverage_report: 'false'
       jacoco_coverage_report_path: 'data-service/build/reports/jacoco'
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
