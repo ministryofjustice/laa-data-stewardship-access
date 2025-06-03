@@ -2,6 +2,21 @@ plugins {
     id 'io.freefair.lombok' version '8.13.1'
     id "com.gorylenko.gradle-git-properties" version "2.4.1"
     id 'uk.gov.laa.ccms.springboot.laa-ccms-spring-boot-gradle-plugin'
+    id 'com.avast.gradle.docker-compose' version '0.17.12'
+}
+
+dockerCompose.isRequiredBy(test)
+dockerCompose.isRequiredBy(integrationTest)
+
+dockerCompose {
+    useComposeFiles = ['../docker-compose.yml']
+    // workaround https://github.com/avast/gradle-docker-compose-plugin/issues/435
+    def dockerPath = ["/usr/bin/docker", "/usr/local/bin/docker"].find {
+        new File(it).exists()
+    }
+    if (dockerPath) {
+        dockerExecutable.set(dockerPath)
+    }
 }
 
 test {
