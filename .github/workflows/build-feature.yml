@@ -7,22 +7,17 @@ on:
 
 jobs:
   build-and-publish-snapshot:
-    steps:
-      - name: Setup Containers
-        run: docker compose up -d
-
-      - name: Build jar and run tests
-        uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v1
-        permissions:
-          contents: write
-          packages: write
-        with:
-          integration_test_task: "integrationTest"
-          publish_package: 'true'
-          is_snapshot: 'true'
-          junit_results_path: 'dstew-access-api/build/test-results'
-          junit_report_path: 'dstew-access-api/build/reports/tests'
-          checkstyle_report_path: 'dstew-access-api/build/reports/checkstyle'
-          jacoco_coverage_report_path: 'dstew-access-api/build/reports/jacoco'
-        secrets:
-          gh_token: ${{ secrets.GITHUB_TOKEN }}
+    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v1
+    permissions:
+      contents: write
+      packages: write
+    with:
+      integration_test_task: "integrationTest"
+      publish_package: 'true'
+      is_snapshot: 'true'
+      junit_results_path: 'data-service/build/test-results'
+      junit_report_path: 'data-service/build/reports/tests'
+      checkstyle_report_path: 'data-service/build/reports/checkstyle'
+      jacoco_coverage_report_path: 'data-service/build/reports/jacoco'
+    secrets:
+      gh_token: ${{ secrets.GITHUB_TOKEN }}
