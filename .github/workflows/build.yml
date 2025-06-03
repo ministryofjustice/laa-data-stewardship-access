@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-publish-snapshot:
-    uses: ./.github/workflows/gradle-build-and-publish.yml@v1
+    uses: ./.github/workflows/gradle-build-and-publish.yml
     permissions:
       contents: write
       packages: write
