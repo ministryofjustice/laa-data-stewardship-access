@@ -9,7 +9,9 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 /**
  * Represents the common audit fields in entities.
@@ -20,7 +22,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 public class EmbeddedRecordHistoryEntity {
 
   @Column(name = "created_at", updatable = false)
-  @CreationTimestamp
+  @CreatedDate  //@CreationTimestamp
   private Instant createdAt;
 
   @CreatedBy
@@ -28,7 +30,7 @@ public class EmbeddedRecordHistoryEntity {
   private String createdBy;
 
   @Column(name = "updated_at")
-  @UpdateTimestamp
+  @LastModifiedDate  //@UpdateTimestamp
   private Instant updatedAt;
 
   @LastModifiedBy
