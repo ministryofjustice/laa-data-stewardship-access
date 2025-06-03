@@ -6,6 +6,7 @@ plugins {
 }
 
 dockerCompose.isRequiredBy(test)
+dockerCompose.isRequiredBy(integrationTest)
 
 dockerCompose {
     useComposeFiles = ['../docker-compose.yml']

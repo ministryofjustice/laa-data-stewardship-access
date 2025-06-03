@@ -12,7 +12,7 @@ jobs:
       contents: write
       packages: write
     with:
-      integration_test_task: "integrationTest"
+      integration_test_task: ""
       publish_package: 'true'
       is_snapshot: 'true'
       junit_results_path: 'data-service/build/test-results'
