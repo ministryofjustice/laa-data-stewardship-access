@@ -4,6 +4,9 @@ on:
   push:
     branches-ignore:
       - main
+      - 'feature-dev/*'
+      - 'feature-test/*'
+
 
 jobs:
   build-and-publish-snapshot:
