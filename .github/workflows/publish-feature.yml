@@ -2,8 +2,9 @@ name: Deploy feature
 
 on:
   push:
-    branches-ignore:
-      - main
+    branches:
+      - 'feature-dev/**'
+      - 'feature-test/**'
 
 permissions:
   contents: read
