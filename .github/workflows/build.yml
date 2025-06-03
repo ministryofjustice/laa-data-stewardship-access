@@ -4,13 +4,10 @@ on:
   push:
     branches-ignore:
       - main
-        
-jobs:
-  setup-containers:
-    uses: ./.github/workflows/bring-up-testing-container.yml
 
+jobs:
   build-and-publish-snapshot:
-    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v1
+    uses: ./.github/workflows/gradle-build-and-publish.yml@v1
     permissions:
       contents: write
       packages: write
