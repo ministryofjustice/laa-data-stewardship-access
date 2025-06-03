@@ -30,11 +30,22 @@ spring:
       sqs:
         endpoint: http://localhost:4566
 
+    azure:
+      active-directory:
+        enabled: ${ENTRA_ENABLED:true}  # set ENTRA_ENABLED=false for development
+        profile:
+          tenant-id: ${ENTRA_TENANT_ID}
+        app-id-uri: ${ENTRA_APP_ID_URI}
+
 info:
   app:
     name: Access
     description: LAA Access Data Stewardship REST API
     version: 1.0.0
+
+logging:
+  level:
+    com.azure.spring: INFO
 
 management:
   endpoints:
