@@ -8,7 +8,11 @@ on:
 jobs:
   build-and-publish-snapshot:
     steps:
-      - uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v1
+      - name: Setup Containers
+        run: docker compose up -d
+
+      - name: Build jar and run tests
+        uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v1
         permissions:
           contents: write
           packages: write
