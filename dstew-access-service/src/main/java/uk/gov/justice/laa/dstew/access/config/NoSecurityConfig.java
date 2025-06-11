@@ -10,7 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * Spring Security configuration if security is disabled (e.g. for development).
  */
-@ConditionalOnProperty(name = "spring.cloud.azure.active-directory.enabled", havingValue = "false")
+@ConditionalOnProperty(name = "feature.security", havingValue = "false")
 @Configuration
 class NoSecurityConfig {
   /**
@@ -23,8 +23,10 @@ class NoSecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
     http
-            .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
-            .csrf(AbstractHttpConfigurer::disable);
+        .authorizeHttpRequests(authorize -> authorize
+            .anyRequest().permitAll())
+        //.oauth2ResourceServer(AbstractHttpConfigurer::disable)
+        .csrf(AbstractHttpConfigurer::disable);
     return http.build();
   }
 }

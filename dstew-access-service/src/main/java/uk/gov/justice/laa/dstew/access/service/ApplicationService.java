@@ -19,7 +19,6 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.dstew.access.config.SqsProducer;
 import uk.gov.justice.laa.dstew.access.entity.ApplicationEntity;
@@ -37,6 +36,7 @@ import uk.gov.justice.laa.dstew.access.model.ApplicationResourceType;
 import uk.gov.justice.laa.dstew.access.model.ApplicationUpdateRequestBody;
 import uk.gov.justice.laa.dstew.access.repository.ApplicationHistoryRepository;
 import uk.gov.justice.laa.dstew.access.repository.ApplicationRepository;
+import uk.gov.justice.laa.dstew.access.validation.ApplicationValidations;
 
 /**
  * Service class for handling items requests.
@@ -50,6 +50,8 @@ public class ApplicationService {
 
   private final ApplicationMapper applicationMapper;
 
+  private final ApplicationValidations applicationValidations;
+
   private final SqsProducer sqsProducer;
 
   private final ObjectMapper objectMapper;
@@ -61,7 +63,8 @@ public class ApplicationService {
    *
    * @param applicationRepository the repository of such applications.
    * @param applicationHistoryRepository the repository of the history of applications.
-   * @param applicationMapper the mapper between entity and DTO.
+   * @param applicationMapper the mapper between entity and DTOs.
+   * @param applicationValidations the validation methods for request DTOs.
    * @param sqsProducer the sender of messages to the queue.
    * @param objectMapper JSON mapper to serialize the history.
    */
@@ -69,11 +72,13 @@ public class ApplicationService {
       final ApplicationRepository applicationRepository,
       final ApplicationHistoryRepository applicationHistoryRepository,
       final ApplicationMapper applicationMapper,
+      final ApplicationValidations applicationValidations,
       final SqsProducer sqsProducer,
       final ObjectMapper objectMapper) {
     this.applicationRepository = applicationRepository;
     this.applicationHistoryRepository = applicationHistoryRepository;
     this.applicationMapper = applicationMapper;
+    this.applicationValidations = applicationValidations;
     this.sqsProducer = sqsProducer;
     this.javers = JaversBuilder.javers().build();
 
@@ -111,6 +116,8 @@ public class ApplicationService {
    */
   @PreAuthorize("hasAuthority('SCOPE_Application.Write') or hasAuthority('APPROLE_ApplicationWriter')")
   public UUID createApplication(ApplicationRequestBody applicationRequestBody) {
+    applicationValidations.checkApplicationRequestBody(applicationRequestBody);
+
     ApplicationEntity applicationEntity =
         applicationMapper.toApplicationEntity(applicationRequestBody);
 
@@ -138,6 +145,8 @@ public class ApplicationService {
   @PreAuthorize("hasAuthority('SCOPE_Application.Write') or hasAuthority('APPROLE_ApplicationWriter')")
   public void updateApplication(UUID id, ApplicationUpdateRequestBody requestBody) {
     ApplicationEntity applicationEntity = checkIfApplicationExists(id);
+
+    applicationValidations.checkApplicationUpdateRequestBody(requestBody, applicationEntity);
 
     applicationMapper.updateApplicationEntity(applicationEntity, requestBody);
     if (applicationEntity.getProceedings() != null) {
