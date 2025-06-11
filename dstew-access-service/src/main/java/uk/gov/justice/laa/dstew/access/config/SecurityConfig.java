@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * Spring Security configuration if security is enabled.
  */
-@ConditionalOnProperty(name = "spring.cloud.azure.active-directory.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "feature.security", havingValue = "true", matchIfMissing = true)
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
@@ -30,12 +30,11 @@ class SecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
     http
-            .with(AadResourceServerHttpSecurityConfigurer.aadResourceServer(), withDefaults())
-            .authorizeHttpRequests(authorize -> authorize
-                    .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                    .anyRequest().authenticated())
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
-            .csrf(AbstractHttpConfigurer::disable);
+        .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+            .anyRequest().authenticated())
+        .with(AadResourceServerHttpSecurityConfigurer.aadResourceServer(), withDefaults())
+        .csrf(AbstractHttpConfigurer::disable);
     return http.build();
   }
 }

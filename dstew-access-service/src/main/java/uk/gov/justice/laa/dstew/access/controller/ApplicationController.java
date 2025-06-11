@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.justice.laa.dstew.access.api.ApplicationsApi;
-import uk.gov.justice.laa.dstew.access.common.logging.aspects.LogMethodArguments;
-import uk.gov.justice.laa.dstew.access.common.logging.aspects.LogMethodResponse;
 import uk.gov.justice.laa.dstew.access.model.Application;
 import uk.gov.justice.laa.dstew.access.model.ApplicationRequestBody;
 import uk.gov.justice.laa.dstew.access.model.ApplicationUpdateRequestBody;
 import uk.gov.justice.laa.dstew.access.service.ApplicationService;
+import uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodArguments;
+import uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodResponse;
 
 /**
  * Controller for handling application requests.

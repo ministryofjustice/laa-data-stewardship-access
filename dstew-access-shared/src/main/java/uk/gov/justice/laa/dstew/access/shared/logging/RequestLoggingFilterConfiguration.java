@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.dstew.access.common.logging;
+package uk.gov.justice.laa.dstew.access.shared.logging;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

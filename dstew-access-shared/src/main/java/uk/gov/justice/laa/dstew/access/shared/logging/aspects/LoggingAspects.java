@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.dstew.access.common.logging.aspects;
+package uk.gov.justice.laa.dstew.access.shared.logging.aspects;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -23,7 +23,7 @@ public class LoggingAspects {
    *
    * @param joinPoint AspectJ-provided join point.
    */
-  @Before("@annotation(uk.gov.justice.laa.dstew.access.common.logging.aspects.LogMethodArguments)")
+  @Before("@annotation(uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodArguments)")
   public void logMethodArgumentsAdvice(JoinPoint joinPoint) {
     if (log.isInfoEnabled()) {
       Object[] argumentsArray = Objects.requireNonNullElse(joinPoint.getArgs(), new Object[] {});
@@ -45,7 +45,7 @@ public class LoggingAspects {
    * @param methodResponse the returned value.
    */
   @AfterReturning(
-      value = "@annotation(uk.gov.justice.laa.dstew.access.common.logging.aspects.LogMethodResponse)",
+      value = "@annotation(uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodResponse)",
       returning = "methodResponse")
   public void logMethodResponseAdvice(JoinPoint joinPoint, Object methodResponse) {
     if (log.isInfoEnabled()) {

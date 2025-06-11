@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.laa.dstew.access.api.ApplicationHistoryApi;
-import uk.gov.justice.laa.dstew.access.common.logging.aspects.LogMethodArguments;
-import uk.gov.justice.laa.dstew.access.common.logging.aspects.LogMethodResponse;
 import uk.gov.justice.laa.dstew.access.model.ApplicationHistoryEntry;
 import uk.gov.justice.laa.dstew.access.model.ApplicationHistoryRequestBody;
 import uk.gov.justice.laa.dstew.access.service.ApplicationService;
+import uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodArguments;
+import uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodResponse;
 
 /**
  * Controller for handling application requests.

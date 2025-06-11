@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.dstew.access.AccessApplication;
 
-@SpringBootTest(classes = AccessApplication.class, properties = "spring.cloud.azure.active-directory.enabled=false")
+@SpringBootTest(classes = AccessApplication.class, properties = "feature.security=false")
 @AutoConfigureMockMvc
 @Transactional
 public class ApplicationControllerIntegrationTest {
