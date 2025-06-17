@@ -1,3 +1,7 @@
 subprojects {
     group = 'uk.gov.justice.laa.dstew.access'
 }
+
+implementation "org.flywaydb:flyway-core"
+runtimeOnly "org.postgresql:postgresql"
+runtimeOnly "org.flywaydb:flyway-database-postgresql"
