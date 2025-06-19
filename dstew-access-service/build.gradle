@@ -64,7 +64,7 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
     implementation 'org.postgresql:postgresql:42.7.6'
-    implementation 'org.javers:javers-persistence-sql:7.8.0'
+    implementation 'org.javers:javers-core:7.8.0' // instead of `implementation 'org.javers:javers-persistence-sql:7.8.0'`
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 

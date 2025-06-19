@@ -1,16 +1,17 @@
 package uk.gov.justice.laa.dstew.access.transformation;
 
-import static uk.gov.justice.laa.dstew.access.shared.security.SecurityUtils.getAuthorities;
-
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 /**
@@ -47,25 +48,27 @@ class TransformationAdvice implements ResponseBodyAdvice<Object> {
     if (body == null || (body instanceof List<?> list && list.isEmpty())) {
       return body;
     }
-    final var authorities = getAuthorities();
     if (body instanceof List<?> list) {
       final var first = list.getFirst();
       final var maybeTransformer = transformerRegistry.getTransformer(first.getClass());
       if (maybeTransformer.isPresent()) {
         @SuppressWarnings("unchecked") final var transformer = (ResponseTransformer<Object>) maybeTransformer.get();
         return list.stream()
-            .map(item -> transformer.transform(item, authorities))
+            .map(transformer::transform)
+            .filter(Objects::nonNull)
             .toList();
       }
-      return body;
     } else {
-      return transformerRegistry.getTransformer(body.getClass())
-          .map(transformer -> {
-            @SuppressWarnings("unchecked")
-            var objTransformer = (ResponseTransformer<Object>) transformer;
-            return objTransformer.transform(body, authorities);
-          })
-          .orElse(body);
+      final var maybeTransformer = transformerRegistry.getTransformer(body.getClass());
+      if (maybeTransformer.isPresent()) {
+        @SuppressWarnings("unchecked") final var transformer = (ResponseTransformer<Object>) maybeTransformer.get();
+        final var transformed = transformer.transform(body);
+        if (transformed == null) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return transformed;
+      }
     }
+    return body;
   }
 }
