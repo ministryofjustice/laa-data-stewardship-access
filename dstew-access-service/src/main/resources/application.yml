@@ -14,13 +14,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  flyway:
-    enabled: true
-    locations: classpath:db
-    baseline-on-migrate: true
-    url: jdbc:postgresql://localhost:5432/laa_db
-    user: laa_user
-    password: laa_password
+
+
   sql:
     init:
       mode: always
