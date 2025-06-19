@@ -41,7 +41,7 @@ CREATE TABLE application_history (
                                      resource_type_changed VARCHAR(100) NOT NULL,
                                      action VARCHAR(100) NOT NULL,
                                      timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                     historic_snapshot JSONB NOT NULL,
+                                     historic_snapshot JSONB NULL, -- was NOT NULL but initial data load failed
                                      application_snapshot JSONB NOT NULL,
 
                                      CONSTRAINT fk_application_history_application FOREIGN KEY (application_id)
