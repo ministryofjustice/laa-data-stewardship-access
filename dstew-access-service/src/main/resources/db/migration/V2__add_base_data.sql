@@ -19,20 +19,20 @@ INSERT INTO applications_proceedings (
     id, application_id, proceeding_code, level_of_service_code,
     created_at, created_by, updated_at, updated_by
 ) VALUES
-    (
-        '456e4567-e89b-12d3-a456-426614174111',
-        '123e4567-e89b-12d3-a456-426614174000',
-        'FAM01',
-        'FULLREP',
-        '2025-05-08T10:00:00Z', 'admin', '2025-05-08T10:00:00Z', 'admin'
-    ),
-(
-    '789e4567-e89b-12d3-a456-426614174222',
-    '123e4567-e89b-12d3-a456-426614174000',
-    'FAM02',
-    'HELP',
-    '2025-05-08T10:00:00Z', 'admin', '2025-05-08T10:00:00Z', 'admin'
-);
+      (
+          '456e4567-e89b-12d3-a456-426614174111',
+          '123e4567-e89b-12d3-a456-426614174000',
+          'FAM01',
+          'FULLREP',
+          '2025-05-08T10:00:00Z', 'admin', '2025-05-08T10:00:00Z', 'admin'
+      ),
+      (
+          '789e4567-e89b-12d3-a456-426614174222',
+          '123e4567-e89b-12d3-a456-426614174000',
+          'FAM02',
+          'HELP',
+          '2025-05-08T10:00:00Z', 'admin', '2025-05-08T10:00:00Z', 'admin'
+      );
 
 INSERT INTO application_history (
     id,
