@@ -2,6 +2,7 @@ package uk.gov.justice.laa.dstew.access.validation;
 
 import static uk.gov.justice.laa.dstew.access.validation.ValidationUtils.notNull;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.dstew.access.entity.ApplicationEntity;
 import uk.gov.justice.laa.dstew.access.model.ApplicationRequestBody;
@@ -14,12 +15,9 @@ import uk.gov.justice.laa.dstew.access.shared.security.EffectiveAuthorizationPro
  * and an exception that wraps those errors (ValidationException).
  */
 @Component
+@RequiredArgsConstructor
 public class ApplicationValidations {
   private final EffectiveAuthorizationProvider entra;
-
-  ApplicationValidations(EffectiveAuthorizationProvider entra) {
-    this.entra = entra;
-  }
 
   /**
    * Validate an ApplicationRequestBody instance.

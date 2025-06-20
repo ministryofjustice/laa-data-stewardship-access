@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import uk.gov.justice.laa.dstew.access.shared.security.EffectiveAuthorizationProvider;
 
 /**
  * Spring Security configuration if security is disabled (e.g. for development).
@@ -28,5 +29,20 @@ class NoSecurityConfig {
         //.oauth2ResourceServer(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable);
     return http.build();
+  }
+
+  @Bean("entra")
+  EffectiveAuthorizationProvider authProvider() {
+    return new EffectiveAuthorizationProvider() {
+      @Override
+      public boolean hasAppRole(String name) {
+        return true;
+      }
+
+      @Override
+      public boolean hasAnyAppRole(String... names) {
+        return true;
+      }
+    };
   }
 }
