@@ -1,39 +1,28 @@
 spring:
-  application:
-    name: LAA Access Data Stewardship API
+  application.name: LAA Access Data Stewardship API
 
   datasource:
     url: jdbc:postgresql://localhost:5432/laa_db
-    driver-class-name: org.postgresql.Driver
     username: laa_user
     password: laa_password
 
   jpa:
-    hibernate:
-      ddl-auto: none  # Or update to validate/update as needed
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate.ddl-auto: none  # Use Flyway for DB schema.
 
-  sql:
-    init:
-      mode: always
-      continue-on-error: true  # helpful for dev environment
+  sql.init.mode: never # Use Flyway for DB schema.
 
   cloud:
     aws:
-      region:
-        static: us-east-1
+      region.static: us-east-1
       credentials:
         access-key: test
         secret-key: test
-      sqs:
-        endpoint: http://localhost:4566
+      sqs.endpoint: http://localhost:4566
 
     azure:
       active-directory:
-        profile:
-          tenant-id: ${ENTRA_TENANT_ID}
+        profile.tenant-id: ${ENTRA_TENANT_ID}
         app-id-uri: ${ENTRA_APP_ID_URI}
 
 info:
@@ -47,16 +36,9 @@ logging:
     com.azure.spring: INFO
 
 management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: always
-  info:
-    env:
-      enabled: true
+  endpoints.web.exposure.include: health,info
+  endpoint.health.show-details: always
+  info.env.enabled: true
 
 ### Set feature flags in the environment to avoid committing insecure values.
 ### For example, `FEATURE_SECURITY=false` to disable endpoint authorization,

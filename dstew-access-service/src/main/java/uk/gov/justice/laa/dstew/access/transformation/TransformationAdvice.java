@@ -3,6 +3,7 @@ package uk.gov.justice.laa.dstew.access.transformation;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
 import org.springframework.http.HttpStatus;
@@ -18,13 +19,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * Intercept controller responses and apply cross-cutting transformations,
  * such as redaction or anonymization (for GDPR or any other reason).
  */
+@RequiredArgsConstructor
 @RestControllerAdvice
 class TransformationAdvice implements ResponseBodyAdvice<Object> {
   private final TransformerRegistry transformerRegistry;
-
-  TransformationAdvice(final TransformerRegistry transformerRegistry) {
-    this.transformerRegistry = transformerRegistry;
-  }
 
   @Override
   public boolean supports(final MethodParameter returnType,
