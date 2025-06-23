@@ -1,0 +1,289 @@
+openapi: 3.0.0
+info:
+  title: Generated API from Excel Spec
+  version: 1.0.0
+paths:
+  /applications:
+    post:
+      summary: Submit application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Invalid input
+components:
+  schemas:
+    Application:
+      type: object
+      properties:
+        application:
+          type: object
+          properties:
+            providerOfficeId:
+              type: string
+              properties: {}
+              description: Unique ID of the provider office
+              format: Alphanumeric
+            client:
+              type: object
+              properties:
+                individualId:
+                  type: string
+                  properties: {}
+                  description: Unique client identifier
+                  format: Number
+                employmentStatusCode:
+                  type: string
+                  properties: {}
+                  description: Employment status code
+                  format: Alphanumeric
+            applicationProviderUsers:
+              type: array
+              items:
+                type: object
+                properties:
+                  providerUserId:
+                    type: string
+                    properties: {}
+                    description: User ID of the provider
+                    format: Alphanumeric
+                  roleTypeCode:
+                    type: string
+                    properties: {}
+                    description: Role type such as CONTACT, REVIEWER
+                    format: Alphanumeric
+            applicationProceedings:
+              type: array
+              items:
+                type: object
+                properties:
+                  proceedingCode:
+                    type: string
+                    properties: {}
+                    description: Proceeding code
+                    format: Alphanumeric
+                  isProceedingConfigDefaulted:
+                    type: boolean
+                    properties: {}
+                    description: Default scope and cost limitations are used
+                    format: true/false
+                  matterTypeCode:
+                    type: string
+                    properties: {}
+                    description: Matter code
+                    format: String
+                  categoryOfLawCode:
+                    type: string
+                    properties: {}
+                    description: Category of law code
+                    format: String
+                  levelOfServiceCode:
+                    type: string
+                    properties: {}
+                    description: Level of service code
+                    format: Number
+                  stageCode:
+                    type: string
+                    properties: {}
+                    description: Stage code
+                    format: Number
+                  substantiveStartDate:
+                    type: string
+                    properties: {}
+                    description: Date substantive work starts
+                    format: YYYY-MM-DD
+                  emergencyStartDate:
+                    type: string
+                    properties: {}
+                    description: Date emergency work starts
+                    format: YYYY-MM-DD
+                  scopeLimitations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scopeLimitationCode:
+                          type: string
+                          properties: {}
+                          description: Scope limitation code
+                          format: String
+                  costLimitationCode:
+                    type: number
+                    properties: {}
+                    description: Cost limitation code
+                    format: Decimal
+                  delegatedFunctions:
+                    type: object
+                    properties:
+                      isDelegatedFunctionsUsed:
+                        type: boolean
+                        properties: {}
+                        description: Whether delegated functions were used
+                        format: true/false
+                      delegatedFunctionsNotificationDate:
+                        type: string
+                        properties: {}
+                        description: Date of delegated function notification
+                        format: YYYY-MM-DD
+                      delegatedFunctionsUsedDate:
+                        type: string
+                        properties: {}
+                        description: Date delegated functions were used
+                        format: YYYY-MM-DD
+            priorAuthorities:
+              type: array
+              items:
+                type: object
+                properties:
+                  requestTypeCode:
+                    type: string
+                    properties: {}
+                    description: Type of prior authority request
+                    format: String
+                  expertType:
+                    type: string
+                    properties: {}
+                    description: Type of expert
+                    format: String
+                  requestedAmount:
+                    type: number
+                    properties: {}
+                    description: Amount requested
+                    format: Decimal
+                  isIntrospective:
+                    type: boolean
+                    properties: {}
+                    description: If request is introspective
+                    format: true/false
+                  requestedDate:
+                    type: string
+                    properties: {}
+                    description: Date request was made
+                    format: YYYY-MM-DD
+                  justification:
+                    type: string
+                    properties: {}
+                    description: Justification text
+                    format: Text
+            linkedApplications:
+              type: array
+              items:
+                type: object
+                properties:
+                  linkedApplicationId:
+                    type: string
+                    properties: {}
+                    description: Linked application identifier
+                    format: string
+                  linkTypeCode:
+                    type: string
+                    properties: {}
+                    description: Link type code
+                    format: string
+                  linkTypeSubCode:
+                    type: string
+                    properties: {}
+                    description: Link type subcode
+                    format: string
+            evidences:
+              type: array
+              items:
+                type: object
+                properties:
+                  sdsUniqueId:
+                    type: string
+                    properties: {}
+                    description: Unique SDS Id for the document evidence
+                    format: UUID
+                  evidenceTypeCode:
+                    type: string
+                    properties: {}
+                    description: Type of evidence e.g. Prior authority, statement
+                      of case, certificate etc
+                    format: string
+                  linkedDocumentId:
+                    type: string
+                    properties: {}
+                    description: Linked document ID - the specific id of the document
+                      i.e. application id, merits assessment id, amendment id
+                    format: string
+                  linkedDocumentTypeCode:
+                    type: string
+                    properties: {}
+                    description: Type of linked document e.g. application, merits
+                      asessment, amendment, appeal etc
+                    format: string
+            assessments:
+              type: array
+              items:
+                type: object
+                properties:
+                  assessmentId:
+                    type: number
+                    properties: {}
+                    description: The ID of the assessment that was completed. This
+                      could be means or merits
+                    format: string
+                  assessmentTypeCode:
+                    type: string
+                    properties: {}
+                    description: ""
+                  individualId:
+                    type: number
+                    properties: {}
+                    description: ""
+                  amendmentId:
+                    type: number
+                    properties: {}
+                    description: ""
+                  appealId:
+                    type: number
+                    properties: {}
+                    description: ""
+                  meansAssessment:
+                    type: object
+                    properties: {}
+                    description: ""
+                  meritsAssessment:
+                    type: object
+                    properties: {}
+                    description: ""
+            interestedParties:
+              type: array
+              items:
+                type: object
+                properties:
+                  individualId:
+                    type: number
+                    properties: {}
+                    description: ""
+                  organizationId:
+                    type: number
+                    properties: {}
+                    description: ""
+                  fullName:
+                    type: string
+                    properties: {}
+                    description: ""
+                  dateOfBirth:
+                    type: string
+                    properties: {}
+                    description: ""
+                    format: YYYY-MM-DD
+                    pattern: YYYY-MM-DD
+                  partyType:
+                    type: string
+                    properties: {}
+                    description: ""
+                  interestTypeCode:
+                    type: string
+                    properties: {}
+                    description: ""
+      required:
+        - providerOfficeId
