@@ -3,23 +3,33 @@ info:
   title: Generated API from Excel Spec
   version: 1.0.0
 paths:
-  /applications:
+  /api/v2/applications:
     post:
       summary: Submit application
+      operationId: createApplicationV2
+      tags:
+        - applicationV2
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Application'
+              $ref: '#/components/schemas/ApplicationV2'
       responses:
-        '200':
-          description: Success
+        '201':
+          description: 'Created'
         '400':
-          description: Invalid input
+          description: 'Bad request'
+        '401':
+          description: 'Unauthorized'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal server error'
+
 components:
   schemas:
-    Application:
+    ApplicationV2:
       type: object
       properties:
         application:
@@ -27,22 +37,16 @@ components:
           properties:
             providerOfficeId:
               type: string
-              properties: {}
               description: Unique ID of the provider office
-              format: Alphanumeric
             client:
               type: object
               properties:
                 individualId:
                   type: string
-                  properties: {}
                   description: Unique client identifier
-                  format: Number
                 employmentStatusCode:
                   type: string
-                  properties: {}
                   description: Employment status code
-                  format: Alphanumeric
             applicationProviderUsers:
               type: array
               items:
@@ -50,14 +54,10 @@ components:
                 properties:
                   providerUserId:
                     type: string
-                    properties: {}
                     description: User ID of the provider
-                    format: Alphanumeric
                   roleTypeCode:
                     type: string
-                    properties: {}
                     description: Role type such as CONTACT, REVIEWER
-                    format: Alphanumeric
             applicationProceedings:
               type: array
               items:
@@ -65,44 +65,30 @@ components:
                 properties:
                   proceedingCode:
                     type: string
-                    properties: {}
                     description: Proceeding code
-                    format: Alphanumeric
                   isProceedingConfigDefaulted:
                     type: boolean
-                    properties: {}
                     description: Default scope and cost limitations are used
-                    format: true/false
                   matterTypeCode:
                     type: string
-                    properties: {}
                     description: Matter code
-                    format: String
                   categoryOfLawCode:
                     type: string
-                    properties: {}
                     description: Category of law code
-                    format: String
                   levelOfServiceCode:
                     type: string
-                    properties: {}
-                    description: Level of service code
-                    format: Number
+                    description: Level of service code (numeric)
                   stageCode:
                     type: string
-                    properties: {}
-                    description: Stage code
-                    format: Number
+                    description: Stage code (numeric)
                   substantiveStartDate:
                     type: string
-                    properties: {}
                     description: Date substantive work starts
-                    format: YYYY-MM-DD
+                    format: date
                   emergencyStartDate:
                     type: string
-                    properties: {}
                     description: Date emergency work starts
-                    format: YYYY-MM-DD
+                    format: date
                   scopeLimitations:
                     type: array
                     items:
@@ -110,32 +96,24 @@ components:
                       properties:
                         scopeLimitationCode:
                           type: string
-                          properties: {}
                           description: Scope limitation code
-                          format: String
                   costLimitationCode:
                     type: number
-                    properties: {}
                     description: Cost limitation code
-                    format: Decimal
                   delegatedFunctions:
                     type: object
                     properties:
                       isDelegatedFunctionsUsed:
                         type: boolean
-                        properties: {}
                         description: Whether delegated functions were used
-                        format: true/false
                       delegatedFunctionsNotificationDate:
                         type: string
-                        properties: {}
                         description: Date of delegated function notification
-                        format: YYYY-MM-DD
+                        format: date
                       delegatedFunctionsUsedDate:
                         type: string
-                        properties: {}
                         description: Date delegated functions were used
-                        format: YYYY-MM-DD
+                        format: date
             priorAuthorities:
               type: array
               items:
@@ -143,34 +121,23 @@ components:
                 properties:
                   requestTypeCode:
                     type: string
-                    properties: {}
                     description: Type of prior authority request
-                    format: String
                   expertType:
                     type: string
-                    properties: {}
                     description: Type of expert
-                    format: String
                   requestedAmount:
                     type: number
-                    properties: {}
                     description: Amount requested
-                    format: Decimal
                   isIntrospective:
                     type: boolean
-                    properties: {}
                     description: If request is introspective
-                    format: true/false
                   requestedDate:
                     type: string
-                    properties: {}
                     description: Date request was made
-                    format: YYYY-MM-DD
+                    format: date
                   justification:
                     type: string
-                    properties: {}
                     description: Justification text
-                    format: Text
             linkedApplications:
               type: array
               items:
@@ -178,19 +145,14 @@ components:
                 properties:
                   linkedApplicationId:
                     type: string
-                    properties: {}
                     description: Linked application identifier
-                    format: string
+                    format: uuid
                   linkTypeCode:
                     type: string
-                    properties: {}
                     description: Link type code
-                    format: string
                   linkTypeSubCode:
                     type: string
-                    properties: {}
                     description: Link type subcode
-                    format: string
             evidences:
               type: array
               items:
@@ -198,53 +160,36 @@ components:
                 properties:
                   sdsUniqueId:
                     type: string
-                    properties: {}
                     description: Unique SDS Id for the document evidence
-                    format: UUID
+                    format: uuid
                   evidenceTypeCode:
                     type: string
-                    properties: {}
-                    description: Type of evidence e.g. Prior authority, statement
-                      of case, certificate etc
-                    format: string
+                    description: Type of evidence, e.g. Prior authority, statement of case, certificate etc
                   linkedDocumentId:
                     type: string
-                    properties: {}
-                    description: Linked document ID - the specific id of the document
-                      i.e. application id, merits assessment id, amendment id
-                    format: string
+                    description: Linked document ID - the specific id of the document, i.e. application id, merits assessment id, amendment id
                   linkedDocumentTypeCode:
                     type: string
-                    properties: {}
-                    description: Type of linked document e.g. application, merits
-                      asessment, amendment, appeal etc
-                    format: string
+                    description: Type of linked document e.g. application, merits, assessment, amendment, appeal etc
             assessments:
               type: array
               items:
                 type: object
                 properties:
                   assessmentId:
-                    type: number
-                    properties: {}
-                    description: The ID of the assessment that was completed. This
-                      could be means or merits
-                    format: string
+                    type: number # TBC
+                    description: The ID of the assessment that was completed. This could be means or merits
                   assessmentTypeCode:
                     type: string
-                    properties: {}
                     description: ""
                   individualId:
-                    type: number
-                    properties: {}
+                    type: number # TBC
                     description: ""
                   amendmentId:
-                    type: number
-                    properties: {}
+                    type: number # TBC
                     description: ""
                   appealId:
-                    type: number
-                    properties: {}
+                    type: number #TBC
                     description: ""
                   meansAssessment:
                     type: object
@@ -260,30 +205,23 @@ components:
                 type: object
                 properties:
                   individualId:
-                    type: number
-                    properties: {}
+                    type: number # TBC
                     description: ""
-                  organizationId:
+                  organizationId: # TBC
                     type: number
-                    properties: {}
                     description: ""
                   fullName:
                     type: string
-                    properties: {}
                     description: ""
                   dateOfBirth:
                     type: string
-                    properties: {}
                     description: ""
-                    format: YYYY-MM-DD
-                    pattern: YYYY-MM-DD
+                    format: date
                   partyType:
                     type: string
-                    properties: {}
                     description: ""
                   interestTypeCode:
                     type: string
-                    properties: {}
                     description: ""
       required:
         - providerOfficeId

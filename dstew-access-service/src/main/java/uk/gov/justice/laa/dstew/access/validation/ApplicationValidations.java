@@ -5,8 +5,8 @@ import static uk.gov.justice.laa.dstew.access.validation.ValidationUtils.notNull
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.dstew.access.entity.ApplicationEntity;
-import uk.gov.justice.laa.dstew.access.model.ApplicationRequestBody;
-import uk.gov.justice.laa.dstew.access.model.ApplicationUpdateRequestBody;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1CreateReq;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1UpdateReq;
 import uk.gov.justice.laa.dstew.access.shared.security.EffectiveAuthorizationProvider;
 
 /**
@@ -20,29 +20,29 @@ public class ApplicationValidations {
   private final EffectiveAuthorizationProvider entra;
 
   /**
-   * Validate an ApplicationRequestBody instance.
+   * Validate an ApplicationV1CreateReq instance.
    *
-   * @param body DTO to validate.
+   * @param dto DTO to validate.
    */
-  public void checkApplicationRequestBody(final ApplicationRequestBody body) {
+  public void checkApplicationV1CreateReq(final ApplicationV1CreateReq dto) {
     final var state = ValidationErrors.empty();
-    state.addIf(body.getProviderOfficeId() == null
-            && !(notNull(body.getIsEmergencyApplication())
-            && "NEW".equals(body.getStatusCode())),
+    state.addIf(dto.getProviderOfficeId() == null
+            && !(notNull(dto.getIsEmergencyApplication())
+            && "NEW".equals(dto.getStatusCode())),
         "BRR-01: Provider office id is required (unless unsubmitted ECT)");
     state.throwIfAny();
   }
 
   /**
-   * Validated an ApplicationUpdateRequestBody instance.
+   * Validate an ApplicationV1UpdateReq instance.
    *
-   * @param body    DTO to validate.
+   * @param dto     DTO to validate.
    * @param current existing persisted entity.
    */
-  public void checkApplicationUpdateRequestBody(final ApplicationUpdateRequestBody body,
+  public void checkApplicationV1UpdateReq(final ApplicationV1UpdateReq dto,
                                                 final ApplicationEntity current) {
     ValidationErrors.empty()
-        .addIf(body.getClientId() != null
+        .addIf(dto.getClientId() != null
                 && entra.hasAppRole("Provider")
                 && !entra.hasAnyAppRole("Caseworker", "Administrator"),
             "BRR-03: Provider role cannot update the client date of birth or NI number")

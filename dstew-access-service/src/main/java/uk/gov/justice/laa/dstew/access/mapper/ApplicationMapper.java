@@ -10,12 +10,12 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import uk.gov.justice.laa.dstew.access.entity.ApplicationEntity;
 import uk.gov.justice.laa.dstew.access.entity.ApplicationHistoryEntity;
-import uk.gov.justice.laa.dstew.access.model.Application;
-import uk.gov.justice.laa.dstew.access.model.ApplicationHistoryEntry;
-import uk.gov.justice.laa.dstew.access.model.ApplicationProceeding;
-import uk.gov.justice.laa.dstew.access.model.ApplicationProceedingUpdateRequestBody;
-import uk.gov.justice.laa.dstew.access.model.ApplicationRequestBody;
-import uk.gov.justice.laa.dstew.access.model.ApplicationUpdateRequestBody;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1CreateReq;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1History;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1Proceeding;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1ProceedingUpdateReq;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1UpdateReq;
 
 /**
  * The mapper between Application and ApplicationEntity.
@@ -29,24 +29,24 @@ public interface ApplicationMapper {
    * @param applicationEntity the application entity
    * @return the application
    */
-  Application toApplication(ApplicationEntity applicationEntity);
+  ApplicationV1 toApplicationV1(ApplicationEntity applicationEntity);
 
   /**
    * Maps the given application to an application entity.
    *
-   * @param applicationRequestBody the application
+   * @param applicationCreateReq the application
    * @return the application entity
    */
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "proceedings", ignore = true)
   @Mapping(target = "recordHistory", ignore = true)
-  ApplicationEntity toApplicationEntity(ApplicationRequestBody applicationRequestBody);
+  ApplicationEntity toApplicationEntity(ApplicationV1CreateReq applicationCreateReq);
 
   /**
    * Maps the given application request to an application entity.
    *
    * @param applicationEntity the application entity
-   * @param applicationUpdateRequestBody the application update request
+   * @param applicationUpdateReq the application update request
    */
   @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(target = "id", ignore = true)
@@ -54,7 +54,7 @@ public interface ApplicationMapper {
   @Mapping(target = "recordHistory", ignore = true)
   void updateApplicationEntity(
       @MappingTarget ApplicationEntity applicationEntity,
-      ApplicationUpdateRequestBody applicationUpdateRequestBody);
+      ApplicationV1UpdateReq applicationUpdateReq);
 
   @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(target = "id", ignore = true)
@@ -63,8 +63,8 @@ public interface ApplicationMapper {
   @Mapping(target = "updatedAt", ignore = true)
   @Mapping(target = "updatedBy", ignore = true)
   void updateApplicationEntity(
-      @MappingTarget Application application,
-      ApplicationUpdateRequestBody applicationUpdateRequestBody);
+      @MappingTarget ApplicationV1 application,
+      ApplicationV1UpdateReq applicationUpdateReq);
 
   /**
    * This mapping exists solely so we can declare the ignored fields, to avoid a warning on the
@@ -74,9 +74,9 @@ public interface ApplicationMapper {
   @Mapping(target = "createdBy", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
   @Mapping(target = "updatedBy", ignore = true)
-  ApplicationProceeding toApplicationProceeding(ApplicationProceedingUpdateRequestBody applicationProceedingUpdateRequestBody);
+  ApplicationV1Proceeding toApplicationV1Proceeding(ApplicationV1ProceedingUpdateReq applicationProceedingUpdateReq);
 
-  ApplicationHistoryEntry toApplicationHistoryEntry(
+  ApplicationV1History toApplicationV1History(
       ApplicationHistoryEntity applicationHistoryEntity);
 
   default OffsetDateTime toOffsetDateTime(Instant instant) {

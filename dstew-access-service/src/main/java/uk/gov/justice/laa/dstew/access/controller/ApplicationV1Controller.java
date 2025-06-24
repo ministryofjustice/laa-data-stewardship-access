@@ -8,42 +8,42 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import uk.gov.justice.laa.dstew.access.api.ApplicationsApi;
-import uk.gov.justice.laa.dstew.access.model.Application;
-import uk.gov.justice.laa.dstew.access.model.ApplicationRequestBody;
-import uk.gov.justice.laa.dstew.access.model.ApplicationUpdateRequestBody;
+import uk.gov.justice.laa.dstew.access.api.ApplicationV1Api;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1CreateReq;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1UpdateReq;
 import uk.gov.justice.laa.dstew.access.service.ApplicationService;
 import uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodArguments;
 import uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodResponse;
 
 /**
- * Controller for handling application requests.
+ * Controller for handling /api/v1/applications requests.
  */
 @RestController
 @RequiredArgsConstructor
-public class ApplicationController implements ApplicationsApi {
+public class ApplicationV1Controller implements ApplicationV1Api {
 
   private final ApplicationService service;
 
   @Override
   @LogMethodResponse
   @LogMethodArguments
-  public ResponseEntity<List<Application>> getApplications() {
+  public ResponseEntity<List<ApplicationV1>> getApplications() {
     return ResponseEntity.ok(service.getAllApplications());
   }
 
   @Override
   @LogMethodResponse
   @LogMethodArguments
-  public ResponseEntity<Application> getApplicationById(UUID id) {
+  public ResponseEntity<ApplicationV1> getApplicationById(UUID id) {
     return ResponseEntity.ok(service.getApplication(id));
   }
 
   @Override
   @LogMethodResponse
   @LogMethodArguments
-  public ResponseEntity<Void> createApplication(@RequestBody ApplicationRequestBody applicationRequestBody) {
-    UUID id = service.createApplication(applicationRequestBody);
+  public ResponseEntity<Void> createApplication(@RequestBody ApplicationV1CreateReq applicationCreateReq) {
+    UUID id = service.createApplication(applicationCreateReq);
 
     URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
         .buildAndExpand(id).toUri();
@@ -53,8 +53,8 @@ public class ApplicationController implements ApplicationsApi {
   @Override
   @LogMethodResponse
   @LogMethodArguments
-  public ResponseEntity<Void> updateApplication(UUID id, ApplicationUpdateRequestBody applicationUpdateRequestBody) {
-    service.updateApplication(id, applicationUpdateRequestBody);
+  public ResponseEntity<Void> updateApplication(UUID id, ApplicationV1UpdateReq applicationUpdateReq) {
+    service.updateApplication(id, applicationUpdateReq);
     return ResponseEntity.noContent().build();
   }
 

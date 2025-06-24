@@ -2,7 +2,7 @@ package uk.gov.justice.laa.dstew.access.transformation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.dstew.access.model.Application;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1;
 import uk.gov.justice.laa.dstew.access.shared.security.EffectiveAuthorizationProvider;
 
 /**
@@ -10,11 +10,11 @@ import uk.gov.justice.laa.dstew.access.shared.security.EffectiveAuthorizationPro
  */
 @Component
 @RequiredArgsConstructor
-class ApplicationTransformer implements ResponseTransformer<Application> {
+class ApplicationV1Transformer implements ResponseTransformer<ApplicationV1> {
   private final EffectiveAuthorizationProvider entra;
 
   @Override
-  public Application transform(final Application response) {
+  public ApplicationV1 transform(final ApplicationV1 response) {
     if (!entra.hasAppRole("ProceedingReader")) {
       response.setProceedings(null);
     }

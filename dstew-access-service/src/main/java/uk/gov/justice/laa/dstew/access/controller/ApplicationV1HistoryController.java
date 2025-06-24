@@ -5,9 +5,9 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.justice.laa.dstew.access.api.ApplicationHistoryApi;
-import uk.gov.justice.laa.dstew.access.model.ApplicationHistoryEntry;
-import uk.gov.justice.laa.dstew.access.model.ApplicationHistoryRequestBody;
+import uk.gov.justice.laa.dstew.access.api.ApplicationV1HistoryApi;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1History;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1HistoryCreateReq;
 import uk.gov.justice.laa.dstew.access.service.ApplicationService;
 import uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodArguments;
 import uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodResponse;
@@ -17,7 +17,7 @@ import uk.gov.justice.laa.dstew.access.shared.logging.aspects.LogMethodResponse;
  */
 @RestController
 @RequiredArgsConstructor
-public class ApplicationHistoryController implements ApplicationHistoryApi {
+public class ApplicationV1HistoryController implements ApplicationV1HistoryApi {
 
   private final ApplicationService service;
 
@@ -26,32 +26,28 @@ public class ApplicationHistoryController implements ApplicationHistoryApi {
   @LogMethodArguments
   public ResponseEntity<Void> recordApplicationHistory(
       final UUID id,
-      final ApplicationHistoryRequestBody applicationHistoryRequestBody) {
-    return null;
+      final ApplicationV1HistoryCreateReq applicationHistoryCreateReq) {
+    return null; // TODO: implement or remove.
   }
 
   @Override
   @LogMethodResponse
   @LogMethodArguments
-  public ResponseEntity<List<ApplicationHistoryEntry>> getApplicationHistory(final UUID applicationId) {
+  public ResponseEntity<List<ApplicationV1History>> getApplicationHistory(final UUID applicationId) {
     return ResponseEntity.ok(service.getAllApplicationHistory(applicationId));
   }
 
   @LogMethodResponse
   @LogMethodArguments
   @Override
-  public ResponseEntity<ApplicationHistoryEntry> getApplicationHistoryById(final UUID applicationId, final UUID id) {
-    return null;
+  public ResponseEntity<ApplicationV1History> getApplicationHistoryById(final UUID applicationId, final UUID id) {
+    return null; // TODO: implement or remove.
   }
 
   @LogMethodResponse
   @LogMethodArguments
   @Override
-  public ResponseEntity<ApplicationHistoryEntry> getLatestApplicationHistory(
-      final UUID applicationId) {
-    ApplicationHistoryEntry latestHistory = service.getApplicationsLatestHistory(applicationId);
-    return ResponseEntity.ok(latestHistory);
+  public ResponseEntity<ApplicationV1History> getLatestApplicationHistory(final UUID applicationId) {
+    return ResponseEntity.ok(service.getApplicationsLatestHistory(applicationId));
   }
-
-
 }
