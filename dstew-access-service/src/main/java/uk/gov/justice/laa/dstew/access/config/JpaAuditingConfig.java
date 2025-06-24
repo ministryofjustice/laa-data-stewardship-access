@@ -12,16 +12,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Configuration for JPA auditing (automatic created & lastModified metadata).
+ * Configuration can be disabled for AccessAppTests.contextLoads().
  */
-@ConditionalOnProperty(name = "feature.jpa-auditing", havingValue = "true", matchIfMissing = true)
-// for AccessAppTests.contextLoads()
+@ConditionalOnProperty(prefix = "feature", name = "disable-jpa-auditing", havingValue = "false", matchIfMissing = true)
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 class JpaAuditingConfig {
   /**
    * Auditor provider implementation for the application.
    *
-   * @return provider of current user name.
+   * @return provider of current username.
    */
   @Bean("auditorProvider")
   AuditorAware<String> auditorProvider() {

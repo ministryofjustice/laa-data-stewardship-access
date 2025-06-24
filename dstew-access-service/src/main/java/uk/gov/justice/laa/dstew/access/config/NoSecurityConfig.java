@@ -11,7 +11,7 @@ import uk.gov.justice.laa.dstew.access.shared.security.EffectiveAuthorizationPro
 /**
  * Spring Security configuration if security is disabled (e.g. for development).
  */
-@ConditionalOnProperty(name = "feature.security", havingValue = "false")
+@ConditionalOnProperty(prefix = "feature", name = "disable-security", havingValue = "true")
 @Configuration
 class NoSecurityConfig {
   /**

@@ -20,9 +20,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import uk.gov.justice.laa.dstew.access.shared.security.EffectiveAuthorizationProvider;
 
 /**
- * Spring Security configuration if security is enabled.
+ * Spring Security configuration if security is not disabled.
  */
-@ConditionalOnProperty(name = "feature.security", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "feature", name = "disable-security", havingValue = "false", matchIfMissing = true)
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity

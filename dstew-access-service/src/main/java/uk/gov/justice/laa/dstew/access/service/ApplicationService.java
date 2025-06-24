@@ -26,14 +26,14 @@ import uk.gov.justice.laa.dstew.access.entity.ApplicationHistoryEntity;
 import uk.gov.justice.laa.dstew.access.exception.ApplicationNotFoundException;
 import uk.gov.justice.laa.dstew.access.mapper.ApplicationMapper;
 import uk.gov.justice.laa.dstew.access.model.ActionType;
-import uk.gov.justice.laa.dstew.access.model.Application;
-import uk.gov.justice.laa.dstew.access.model.ApplicationHistoryEntry;
-import uk.gov.justice.laa.dstew.access.model.ApplicationHistoryMessage;
-import uk.gov.justice.laa.dstew.access.model.ApplicationHistoryRequestBody;
-import uk.gov.justice.laa.dstew.access.model.ApplicationProceeding;
-import uk.gov.justice.laa.dstew.access.model.ApplicationRequestBody;
-import uk.gov.justice.laa.dstew.access.model.ApplicationResourceType;
-import uk.gov.justice.laa.dstew.access.model.ApplicationUpdateRequestBody;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1CreateReq;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1History;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1HistoryCreateReq;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1HistoryMessage;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1Proceeding;
+import uk.gov.justice.laa.dstew.access.model.ApplicationV1UpdateReq;
+import uk.gov.justice.laa.dstew.access.model.ResourceType;
 import uk.gov.justice.laa.dstew.access.repository.ApplicationHistoryRepository;
 import uk.gov.justice.laa.dstew.access.repository.ApplicationRepository;
 import uk.gov.justice.laa.dstew.access.validation.ApplicationValidations;
@@ -92,8 +92,8 @@ public class ApplicationService {
    * @return the list of applications
    */
   @PreAuthorize("@entra.hasAppRole('ApplicationReader')")
-  public List<Application> getAllApplications() {
-    return applicationRepository.findAll().stream().map(applicationMapper::toApplication).toList();
+  public List<ApplicationV1> getAllApplications() {
+    return applicationRepository.findAll().stream().map(applicationMapper::toApplicationV1).toList();
   }
 
   /**
@@ -103,23 +103,22 @@ public class ApplicationService {
    * @return the requested application
    */
   @PreAuthorize("@entra.hasAppRole('ApplicationReader')")
-  public Application getApplication(UUID id) {
-    ApplicationEntity applicationEntity = checkIfApplicationExists(id);
-    return applicationMapper.toApplication(applicationEntity);
+  public ApplicationV1 getApplication(UUID id) {
+    var applicationEntity = checkIfApplicationExists(id);
+    return applicationMapper.toApplicationV1(applicationEntity);
   }
 
   /**
    * Creates an application.
    *
-   * @param applicationRequestBody the application to be created
+   * @param applicationCreateReq the application to be created
    * @return the id of the created application
    */
   @PreAuthorize("@entra.hasAppRole('ApplicationWriter')")
-  public UUID createApplication(ApplicationRequestBody applicationRequestBody) {
-    applicationValidations.checkApplicationRequestBody(applicationRequestBody);
+  public UUID createApplication(ApplicationV1CreateReq applicationCreateReq) {
+    applicationValidations.checkApplicationV1CreateReq(applicationCreateReq);
 
-    ApplicationEntity applicationEntity =
-        applicationMapper.toApplicationEntity(applicationRequestBody);
+    var applicationEntity = applicationMapper.toApplicationEntity(applicationCreateReq);
 
     //set the application entity id to null to ensure a new entity is created
     if (applicationEntity.getProceedings() != null) {
@@ -140,28 +139,29 @@ public class ApplicationService {
    * Update an application for legal aid, keeping history.
    *
    * @param id the unique identifier of the application.
-   * @param requestBody the DTO containing the change.
+   * @param applicationUpdateReq the DTO containing the change.
    */
   @PreAuthorize("@entra.hasAppRole('ApplicationWriter')")
-  public void updateApplication(UUID id, ApplicationUpdateRequestBody requestBody) {
-    ApplicationEntity applicationEntity = checkIfApplicationExists(id);
+  public void updateApplication(UUID id, ApplicationV1UpdateReq applicationUpdateReq) {
+    var applicationEntity = checkIfApplicationExists(id);
 
-    applicationValidations.checkApplicationUpdateRequestBody(requestBody, applicationEntity);
+    applicationValidations.checkApplicationV1UpdateReq(applicationUpdateReq, applicationEntity);
 
-    applicationMapper.updateApplicationEntity(applicationEntity, requestBody);
+    applicationMapper.updateApplicationEntity(applicationEntity, applicationUpdateReq);
     if (applicationEntity.getProceedings() != null) {
       applicationEntity.getProceedings().forEach(p -> p.setApplication(applicationEntity));
     }
 
     applicationRepository.save(applicationEntity);
 
-    Map<String, Object> snapshot =
-        objectMapper.convertValue(applicationMapper.toApplication(applicationEntity), new TypeReference<>() {});
+    var snapshot = objectMapper
+        .convertValue(applicationMapper.toApplicationV1(applicationEntity),
+            new TypeReference<Map<String, Object>>() {});
 
-    ApplicationHistoryMessage message = ApplicationHistoryMessage.builder()
+    var message = ApplicationV1HistoryMessage.builder()
         .userId(applicationEntity.getUpdatedBy())
         .action(UPDATED)
-        .resourceTypeChanged(ApplicationResourceType.APPLICATION)
+        .resourceTypeChanged(ResourceType.APPLICATION)
         .applicationId(applicationEntity.getId())
         .historicSnapshot(snapshot)
         .timestamp(OffsetDateTime.now())
@@ -177,21 +177,18 @@ public class ApplicationService {
    * @return the list of history for an application
    */
   @PreAuthorize("@entra.hasAppRole('ApplicationReader')")
-  public List<ApplicationHistoryEntry> getAllApplicationHistory(UUID applicationId) {
+  public List<ApplicationV1History> getAllApplicationHistory(UUID applicationId) {
     return applicationHistoryRepository.findByApplicationId(applicationId)
-        .stream().map(applicationMapper::toApplicationHistoryEntry).toList();
+        .stream().map(applicationMapper::toApplicationV1History).toList();
   }
 
   protected void createAndSendHistoricRecord(ApplicationEntity applicationEntity, ActionType actionType) {
-    Map<String, Object> historicSnapshot =
-        objectMapper.convertValue(
-            applicationMapper.toApplication(applicationEntity),
+    var historicSnapshot = objectMapper
+        .convertValue(applicationMapper.toApplicationV1(applicationEntity),
             new TypeReference<Map<String, Object>>() {});
 
-    ApplicationHistoryMessage historyMessage = ApplicationHistoryMessage.builder()
-        .userId(applicationEntity.getUpdatedBy())
-        .action(ActionType.CREATED)
-        .resourceTypeChanged(ApplicationResourceType.APPLICATION)
+    var historyMessage = ApplicationV1HistoryMessage.builder()
+        .resourceTypeChanged(ResourceType.APPLICATION)
         .applicationId(applicationEntity.getId())
         .historicSnapshot(historicSnapshot)
         .timestamp(applicationEntity.getCreatedAt().atOffset(ZoneOffset.UTC))
@@ -207,75 +204,57 @@ public class ApplicationService {
    * @return the latest history for the application.
    */
   @PreAuthorize("@entra.hasAppRole('ApplicationReader')")
-  public ApplicationHistoryEntry getApplicationsLatestHistory(UUID applicationId) {
+  public ApplicationV1History getApplicationsLatestHistory(UUID applicationId) {
     checkIfApplicationExists(applicationId);
 
-    ApplicationHistoryEntity latestEntry = applicationHistoryRepository
+    var latestEntry = applicationHistoryRepository
         .findFirstByApplicationIdOrderByTimestampDesc(applicationId)
         .orElseThrow(() ->
             new ApplicationNotFoundException("No history found for application id: " + applicationId));
 
-    return applicationMapper.toApplicationHistoryEntry(latestEntry);
+    return applicationMapper.toApplicationV1History(latestEntry);
   }
 
   /**
    * Create a history record for an application.
    *
    * @param applicationId unique identifier of the application.
-   * @param applicationHistoryRequestBody the DTO containing the history.
+   * @param applicationHistoryCreateReq the DTO containing the history.
    * @return a unique identifier for the history.
    */
   @PreAuthorize("@entra.hasAppRole('ApplicationWriter')")
-  public UUID createApplicationHistory(UUID applicationId, ApplicationHistoryRequestBody applicationHistoryRequestBody) {
-
-    ApplicationHistoryEntity applicationHistoryEntity = new ApplicationHistoryEntity();
-
+  public UUID createApplicationHistory(UUID applicationId, ApplicationV1HistoryCreateReq applicationHistoryCreateReq) {
+    var applicationHistoryEntity = new ApplicationHistoryEntity();
     applicationHistoryEntity.setApplicationId(applicationId);
-    applicationHistoryEntity.setUserId(applicationHistoryRequestBody.getUserId());
-    applicationHistoryEntity.setAction(applicationHistoryRequestBody.getAction().getValue());
-    applicationHistoryEntity.setResourceTypeChanged(
-        applicationHistoryRequestBody.getResourceTypeChanged().getValue());
-    applicationHistoryEntity.setApplicationSnapshot(
-        applicationHistoryRequestBody.getHistoricSnapshot());
-    applicationHistoryEntity.setTimestamp(applicationHistoryRequestBody.getTimestamp().toInstant());
+    applicationHistoryEntity.setUserId(applicationHistoryCreateReq.getUserId());
+    applicationHistoryEntity.setAction(applicationHistoryCreateReq.getAction().getValue());
+    applicationHistoryEntity.setResourceTypeChanged(applicationHistoryCreateReq.getResourceTypeChanged().getValue());
+    applicationHistoryEntity.setApplicationSnapshot(applicationHistoryCreateReq.getHistoricSnapshot());
+    applicationHistoryEntity.setTimestamp(applicationHistoryCreateReq.getTimestamp().toInstant());
 
-    if (applicationHistoryRequestBody.getResourceTypeChanged()
-        == ApplicationResourceType.APPLICATION) {
-      if (applicationHistoryRequestBody.getAction() == ActionType.CREATED) {
-        applicationHistoryEntity.setHistoricSnapshot(
-            applicationHistoryRequestBody.getHistoricSnapshot());
-
-      } else if (applicationHistoryRequestBody.getAction() == ActionType.UPDATED) {
-        ApplicationHistoryEntry currentApplicationHistory =
-            getApplicationsLatestHistory(applicationId);
-
-        Application oldVersion = objectMapper.convertValue(
-            currentApplicationHistory.getApplicationSnapshot(),
-            new TypeReference<>() {
-            }
-        );
-
-        Application newVersion = objectMapper.convertValue(
-            applicationHistoryRequestBody.getHistoricSnapshot(),
-            new TypeReference<>() {
-            }
-        );
-
+    if (applicationHistoryCreateReq.getResourceTypeChanged() == ResourceType.APPLICATION) {
+      if (applicationHistoryCreateReq.getAction() == ActionType.CREATED) {
+        applicationHistoryEntity.setHistoricSnapshot(applicationHistoryCreateReq.getHistoricSnapshot());
+      } else if (applicationHistoryCreateReq.getAction() == ActionType.UPDATED) {
+        var currentApplicationHistory = getApplicationsLatestHistory(applicationId);
+        var oldVersion = objectMapper
+            .convertValue(currentApplicationHistory.getApplicationSnapshot(),
+                new TypeReference<ApplicationV1>() {});
+        var newVersion = objectMapper
+            .convertValue(applicationHistoryCreateReq.getHistoricSnapshot(),
+                new TypeReference<ApplicationV1>() {});
         Diff diff = javers.compare(oldVersion, newVersion);
 
-        Map<Object, Map<String, Object>> changesByObject = new LinkedHashMap<>();
+        var changesByObject = new LinkedHashMap<Object, Map<String, Object>>();
+        var applicationChanges = new ApplicationV1();
+        var updatedProceedings = new ArrayList<ApplicationV1Proceeding>();
 
-        Application applicationChanges = new Application();
-        List<ApplicationProceeding> updatedProceedings = new ArrayList<>();
-
-        for (ValueChange change : diff.getChangesByType(ValueChange.class)) {
+        for (var change : diff.getChangesByType(ValueChange.class)) {
           if (change.getAffectedObject().isPresent()) {
-            Object cdo = change.getAffectedObject().get();
-
-            Map<String, Object> fields = changesByObject.computeIfAbsent(cdo, k -> new LinkedHashMap<>());
+            var cdo = change.getAffectedObject().get();
+            var fields = changesByObject.computeIfAbsent(cdo, k -> new LinkedHashMap<String, Object>());
             fields.put(change.getPropertyName(), change.getRight());
-
-            Object id = getObjectId(cdo);
+            var id = getObjectId(cdo);
             if (id != null) {
               fields.putIfAbsent("id", id);
             }
@@ -283,14 +262,14 @@ public class ApplicationService {
         }
 
         // Now apply changes
-        for (Map.Entry<Object, Map<String, Object>> entry : changesByObject.entrySet()) {
-          Object target = entry.getKey();
-          Map<String, Object> fields = entry.getValue();
+        for (var entry : changesByObject.entrySet()) {
+          var target = entry.getKey();
+          var fields = entry.getValue();
 
-          if (target instanceof Application) {
+          if (target instanceof ApplicationV1) {
             populateFields(applicationChanges, fields);
-          } else if (target instanceof ApplicationProceeding) {
-            ApplicationProceeding proceeding = new ApplicationProceeding();
+          } else if (target instanceof ApplicationV1Proceeding) {
+            var proceeding = new ApplicationV1Proceeding();
             populateFields(proceeding, fields);
             updatedProceedings.add(proceeding);
           }
@@ -301,7 +280,8 @@ public class ApplicationService {
         }
 
         // Convert to map for historic snapshot
-        Map<String, Object> snapshot = objectMapper.convertValue(applicationChanges, new TypeReference<>() {});
+        var snapshot = objectMapper
+            .convertValue(applicationChanges, new TypeReference<Map<String, Object>>() {});
         applicationHistoryEntity.setHistoricSnapshot(snapshot);
       }
     }

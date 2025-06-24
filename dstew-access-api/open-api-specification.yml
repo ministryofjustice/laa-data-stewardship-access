@@ -6,7 +6,7 @@ paths:
   /api/v1/applications:
     get:
       tags:
-        - applications
+        - applicationV1
       summary: Get applications
       operationId: getApplications
       responses:
@@ -15,7 +15,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Applications"
+                $ref: "#/components/schemas/ApplicationV1Collection"
         '400':
           description: 'Bad request'
         '401':
@@ -28,7 +28,7 @@ paths:
           description: 'Internal server error'
     post:
       tags:
-        - applications
+        - applicationV1
       summary: Create an application
       operationId: createApplication
       requestBody:
@@ -36,7 +36,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationRequestBody'
+              $ref: '#/components/schemas/ApplicationV1CreateReq'
       responses:
         '201':
           description: 'Created'
@@ -56,7 +56,7 @@ paths:
       summary: Get application by id
       operationId: getApplicationById
       tags:
-        - applications
+        - applicationV1
       parameters:
         - name: id
           in: path
@@ -71,7 +71,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Application"
+                $ref: "#/components/schemas/ApplicationV1"
         '400':
           description: 'Bad request'
         '401':
@@ -84,7 +84,7 @@ paths:
           description: 'Internal server error'
     patch:
       tags:
-        - applications
+        - applicationV1
       summary: Update an application
       operationId: updateApplication
       parameters:
@@ -100,7 +100,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationUpdateRequestBody'
+              $ref: '#/components/schemas/ApplicationV1UpdateReq'
       responses:
         '204':
           description: No content
@@ -118,7 +118,7 @@ paths:
       summary: Delete application by id
       operationId: deleteApplication
       tags:
-        - applications
+        - applicationV1
       parameters:
         - name: id
           in: path
@@ -146,7 +146,7 @@ paths:
       summary: Record an application history entry
       operationId: recordApplicationHistory
       tags:
-        - application-history
+        - applicationV1-history
       parameters:
         - name: application-id
           in: path
@@ -161,7 +161,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationHistoryRequestBody'
+              $ref: '#/components/schemas/ApplicationV1HistoryCreateReq'
       responses:
         '201':
           description: 'Created'
@@ -179,7 +179,7 @@ paths:
       summary: Get history for an application
       operationId: getApplicationHistory
       tags:
-        - application-history
+        - applicationV1-history
       parameters:
         - name: application-id
           in: path
@@ -194,7 +194,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApplicationHistory"
+                $ref: "#/components/schemas/ApplicationV1HistoryCollection"
         '400':
           description: 'Bad request'
         '401':
@@ -210,7 +210,7 @@ paths:
       summary: Get a specific history record for an application
       operationId: getApplicationHistoryById
       tags:
-        - application-history
+        - applicationV1-history
       parameters:
         - name: application-id
           in: path
@@ -232,7 +232,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApplicationHistoryEntry"
+                $ref: "#/components/schemas/ApplicationV1History"
         '400':
           description: 'Bad request'
         '401':
@@ -248,7 +248,7 @@ paths:
       summary: Get the latest history record for an application
       operationId: getLatestApplicationHistory
       tags:
-        - application-history
+        - applicationV1-history
       parameters:
         - name: application-id
           in: path
@@ -263,7 +263,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApplicationHistoryEntry"
+                $ref: "#/components/schemas/ApplicationV1History"
         '400':
           description: 'Bad request'
         '401':
@@ -277,7 +277,7 @@ paths:
 
 components:
   schemas:
-    Application:
+    ApplicationV1:
       required:
         - id
         - provider_firm_id
@@ -303,10 +303,10 @@ components:
         proceedings:
           type: array
           items:
-            $ref: "#/components/schemas/ApplicationProceeding"
+            $ref: "#/components/schemas/ApplicationV1Proceeding"
       allOf:
-        - $ref: "#/components/schemas/recordHistory"
-    ApplicationRequestBody:
+        - $ref: "#/components/schemas/RecordHistory"
+    ApplicationV1CreateReq:
       required:
         - provider_firm_id
         - provider_office_id
@@ -328,8 +328,8 @@ components:
         proceedings:
           type: array
           items:
-            $ref: "#/components/schemas/ApplicationProceedingRequestBody"
-    ApplicationUpdateRequestBody:
+            $ref: "#/components/schemas/ApplicationV1ProceedingCreateReq"
+    ApplicationV1UpdateReq:
       properties:
         provider_firm_id:
           type: string
@@ -347,8 +347,8 @@ components:
         proceedings:
           type: array
           items:
-            $ref: "#/components/schemas/ApplicationProceedingUpdateRequestBody"
-    ApplicationProceeding:
+            $ref: "#/components/schemas/ApplicationV1ProceedingUpdateReq"
+    ApplicationV1Proceeding:
       properties:
         id:
           type: string
@@ -358,8 +358,8 @@ components:
         level_of_service_code:
           type: string
       allOf:
-        - $ref: "#/components/schemas/recordHistory"
-    ApplicationProceedingRequestBody:
+        - $ref: "#/components/schemas/RecordHistory"
+    ApplicationV1ProceedingCreateReq:
       required:
         - proceeding_code
       properties:
@@ -367,7 +367,7 @@ components:
           type: string
         level_of_service_code:
           type: string
-    ApplicationProceedingUpdateRequestBody:
+    ApplicationV1ProceedingUpdateReq:
       required:
         - proceeding_code
       properties:
@@ -378,7 +378,7 @@ components:
           type: string
         level_of_service_code:
           type: string
-    recordHistory:
+    RecordHistory:
       required:
         - created_at
         - created_by
@@ -396,12 +396,12 @@ components:
         updated_by:
           type: string
 
-    Applications:
+    ApplicationV1Collection:
       type: array
       items:
-        $ref: "#/components/schemas/Application"
+        $ref: "#/components/schemas/ApplicationV1"
 
-    ApplicationHistoryRequestBody:
+    ApplicationV1HistoryCreateReq:
       required:
         - user_id
         - action
@@ -414,7 +414,7 @@ components:
         action:
           $ref: "#/components/schemas/ActionType"
         resource_type_changed:
-          $ref: "#/components/schemas/ApplicationResourceType"
+          $ref: "#/components/schemas/ResourceType"
         historic_snapshot:
           type: object
           additionalProperties: true
@@ -422,9 +422,9 @@ components:
         timestamp:
           type: string
           format: date-time
-    ApplicationHistoryMessage:
+    ApplicationV1HistoryMessage:
       allOf:
-        - $ref: "#/components/schemas/ApplicationHistoryRequestBody"
+        - $ref: "#/components/schemas/ApplicationV1HistoryCreateReq"
       required:
         - user_id
         - application_id
@@ -437,9 +437,9 @@ components:
           type: string
           format: uuid
 
-    ApplicationHistoryEntry:
+    ApplicationV1History:
       allOf:
-        - $ref: "#/components/schemas/ApplicationHistoryMessage"
+        - $ref: "#/components/schemas/ApplicationV1HistoryMessage"
         - type: object
           properties:
             id:
@@ -449,13 +449,12 @@ components:
               type: object
               additionalProperties: true
               description: A JSON representation of the application at the time of the action
-    ApplicationHistory:
+    ApplicationV1HistoryCollection:
       type: array
       items:
-        $ref: "#/components/schemas/ApplicationHistoryEntry"
+        $ref: "#/components/schemas/ApplicationV1History"
 
-
-    ApplicationResourceType:
+    ResourceType:
       type: string
       description: The type of resource (e.g., APPLICATION, PROCEEDING)
       enum:

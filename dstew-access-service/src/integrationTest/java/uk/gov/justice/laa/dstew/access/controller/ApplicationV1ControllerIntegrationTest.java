@@ -18,10 +18,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.dstew.access.AccessApp;
 
-@SpringBootTest(classes = AccessApp.class, properties = "feature.security=false")
+@SpringBootTest(classes = AccessApp.class, properties = "feature.disable-security=true")
 @AutoConfigureMockMvc
 @Transactional
-public class ApplicationControllerIntegrationTest {
+public class ApplicationV1ControllerIntegrationTest {
 
   @Autowired
   private MockMvc mockMvc;

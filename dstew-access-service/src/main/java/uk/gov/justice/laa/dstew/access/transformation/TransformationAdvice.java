@@ -40,33 +40,35 @@ class TransformationAdvice implements ResponseBodyAdvice<Object> {
   }
 
   @Override
-  public Object beforeBodyWrite(final Object body, final MethodParameter returnType,
+  public Object beforeBodyWrite(final Object responseDto, final MethodParameter returnType,
                                 final MediaType contentType, final Class<? extends HttpMessageConverter<?>> converterType,
                                 final ServerHttpRequest request, final ServerHttpResponse response) {
-    if (body == null || (body instanceof List<?> list && list.isEmpty())) {
-      return body;
-    }
-    if (body instanceof List<?> list) {
-      final var first = list.getFirst();
-      final var maybeTransformer = transformerRegistry.getTransformer(first.getClass());
-      if (maybeTransformer.isPresent()) {
-        @SuppressWarnings("unchecked") final var transformer = (ResponseTransformer<Object>) maybeTransformer.get();
-        return list.stream()
-            .map(transformer::transform)
-            .filter(Objects::nonNull)
-            .toList();
-      }
-    } else {
-      final var maybeTransformer = transformerRegistry.getTransformer(body.getClass());
-      if (maybeTransformer.isPresent()) {
-        @SuppressWarnings("unchecked") final var transformer = (ResponseTransformer<Object>) maybeTransformer.get();
-        final var transformed = transformer.transform(body);
-        if (transformed == null) {
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    if (responseDto != null) {
+      if (responseDto instanceof List<?> listDto) {
+        if (!listDto.isEmpty()) {
+          final var maybeTransformer = transformerRegistry.getTransformer(listDto.getFirst().getClass());
+          if (maybeTransformer.isPresent()) {
+            @SuppressWarnings("unchecked") final var transformer = (ResponseTransformer<Object>) maybeTransformer.get();
+            return listDto.stream()
+                .map(transformer::transform)
+                .filter(Objects::nonNull)
+                .toList();
+          }
         }
-        return transformed;
+      } else {
+        final var maybeTransformer = transformerRegistry.getTransformer(responseDto.getClass());
+        if (maybeTransformer.isPresent()) {
+          @SuppressWarnings("unchecked") final var transformer = (ResponseTransformer<Object>) maybeTransformer.get();
+          final var transformed = transformer.transform(responseDto);
+          if (transformed == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+          }
+          return transformed;
+        }
       }
     }
-    return body;
+    // If no transformer was invoked, then the controller method can still return `null` (or a list
+    // containing `null` elements) without throwing a `NOT_FOUND` exception (or filtering them out).
+    return responseDto;
   }
 }
