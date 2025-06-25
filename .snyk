@@ -7,6 +7,16 @@ ignore:
         reason: >-
           commons-beansutil is only used by Checkstyle plugin and is not part of
           the built artifact
-        expires: 2025-06-28T16:12:59.422Z
+        expires: 2025-08-01T00:00:00.000Z
         created: 2025-05-29T16:12:59.424Z
+  SNYK-JAVA-ORGPOSTGRESQL-10343494:
+    - '*':
+        reason: Expect to upgrade to latest spring-boot-dependencies very soon
+        expires: 2025-07-01T00:00:00.000Z
+        created: 2025-06-25T15:54:56.567Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-10365122:
+    - '*':
+        reason: Expect to upgrade to latest spring-boot-dependencies very soon
+        expires: 2025-07-01T00:00:00.000Z
+        created: 2025-06-25T15:54:40.090Z
 patch: {}
