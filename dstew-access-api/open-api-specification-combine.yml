@@ -17,7 +17,7 @@ paths:
   /api/v2/applications:
     $ref: "./open-api-specification-new.yml#/paths/~1api~1v2~1applications"
   /api/v2/draftapplications:
-    $ref: "./open-api-blankapplication-specification.yml#/paths/~1api~1v2~1default-applications"
+    $ref: "./open-api-draftapplication-specification.yml#/paths/~1api~1v2~1draft-applications"
 
 components:
   schemas:
@@ -38,4 +38,4 @@ components:
     ApplicationV2:
       $ref: "./open-api-specification-new.yml#/components/schemas/ApplicationV2"
     DraftApplication:
-      $ref: "./open-api-blankapplication-specification.yml#/components/schemas/DraftApplication"
+      $ref: "./open-api-draftapplication-specification.yml#/components/schemas/DraftApplication"
