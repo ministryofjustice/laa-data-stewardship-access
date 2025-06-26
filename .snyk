@@ -37,3 +37,7 @@ exclude:
   global:
     - dstew-access-service/src/test
     - dstew-access-service/src/integrationTest
+    ### Work around `snyk code test` in `snyk-vulnerability-scan` workflow:
+    - dstew-access-service/src/main/java/uk/gov/justice/laa/dstew/access/config/NoSecurityConfig.java
+    - dstew-access-service/src/main/java/uk/gov/justice/laa/dstew/access/config/SecurityConfig.java
+    - dstew-access-service/src/main/java/uk/gov/justice/laa/dstew/access/controller/ApplicationV1Controller.java
