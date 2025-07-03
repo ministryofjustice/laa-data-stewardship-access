@@ -10,11 +10,12 @@ paths:
       tags:
         - draftapplication
       requestBody:
-        required: true
+        description: create a draft application
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DraftApplication'
+              $ref: '#/components/schemas/DraftApplicationCreateReq'
+
       responses:
         '201':
           description: 'Created'
@@ -31,21 +32,27 @@ components:
   schemas:
     DraftApplication:
       type: object
+      additionalProperties: true
       properties:
-        application:
-          type: object
-          properties:
-            providerOfficeId:
+            id:
               type: string
-              description: Unique ID of the provider office
-            client:
-              type: object
-              properties:
-                individualId:
-                  type: string
-                  description: Unique client identifier
-                employmentStatusCode:
-                  type: string
-                  description: Employment status code
-      required:
-        - providerOfficeId
+              format: uuid
+              description: Unique ID of the application
+            client_id:
+              type: string
+              format: uuid
+              description: Unique client identifier
+            provider_id:
+              type: string
+              format: uuid
+              description: Unique ID of the provider
+    DraftApplicationCreateReq:
+      type: object
+      additionalProperties: true
+      properties:
+        provider_id:
+          type: string
+          format: uuid
+        client_id:
+          type: string
+          format: uuid
