@@ -22,7 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @RequiredArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "draftapplications")
+@Table(name = "draft_applications")
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DraftApplicationEntity {
   @Id
