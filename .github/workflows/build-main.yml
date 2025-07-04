@@ -20,14 +20,12 @@ jobs:
       checkstyle_report_path: 'dstew-access-service/build/reports/checkstyle'
       jacoco_coverage_report: 'false'
       jacoco_coverage_report_path: 'dstew-access-service/build/reports/jacoco'
-      ### Let's see how github-actions-bot works for now.
-      #github_bot_username: 'laa-ccms-caab-service'
+      github_bot_username: 'laa-data-stewardship'
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
-      ### May need the following when creating a tag triggers downstream jobs.
-      #github_app_id: ${{ vars.LAA_CCMS_CAAB_SERVICE_APP_ID }}
-      #github_app_private_key: ${{ secrets.LAA_CCMS_CAAB_SERVICE_KEY }}
-      #github_app_organisation: 'ministryofjustice'
+      github_app_id: ${{ secrets.GITHUBAPP_ID }}
+      github_app_private_key: ${{ secrets.GITHUBAPP_PRIVATE_KEY }}
+      github_app_organisation: 'ministryofjustice'
 
   vulnerability-report:
     if: ${{ github.event.pull_request.merged == true }}
