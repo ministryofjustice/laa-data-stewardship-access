@@ -1,9 +1,12 @@
 package uk.gov.justice.laa.dstew.access.controller;
 
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.junit.jupiter.api.BeforeAll;
+import cloud.localstack.awssdkv1.TestUtils;
+import com.amazonaws.services.sqs.AmazonSQS;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -14,17 +17,17 @@ import uk.gov.justice.laa.dstew.access.AccessApp;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SQS;
 
 @SpringBootTest(classes = AccessApp.class, properties = "feature.disable-security=true")
-@AutoConfigureMockMvc
-@Transactional
 @Testcontainers
 public class BaseIntegrationTest {
 
-    private static DockerImageName LOCALSTACK_IMAGE =
-            DockerImageName.parse("localstack/localstack:3");
+    public static AmazonSQS amazonSQS;
+
+    public static String queueUrl;
 
     @Container
     public static LocalStackContainer localStackContainer =
-            new LocalStackContainer(LOCALSTACK_IMAGE)
+            new LocalStackContainer(
+                    DockerImageName.parse("localstack/localstack:3"))
             .withServices(SQS);
 
     @Container
@@ -33,8 +36,7 @@ public class BaseIntegrationTest {
             new PostgreSQLContainer<>("postgres:14.3")
                 .withDatabaseName("laa_db")
                 .withUsername("laa_user")
-                .withPassword("laa_password")
-                .withExposedPorts(5432);
+                .withPassword("laa_password");
 
     static {
         setUpDatabase();
@@ -44,5 +46,17 @@ public class BaseIntegrationTest {
         postgresContainer.start();
         System.setProperty("DB_PORT", postgresContainer.getFirstMappedPort().toString());
         System.out.println("DB_PORT: " + System.getProperty("DB_PORT"));
+    }
+
+    @DynamicPropertySource
+    static void registerProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.cloud.aws.sqs.endpoint",
+                () -> localStackContainer.getEndpointOverride(SQS).toString());
+    }
+
+    @BeforeAll
+    static void beforeAll() {
+        amazonSQS = TestUtils.getClientSQS(localStackContainer.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
+        queueUrl = amazonSQS.createQueue("test-queue").getQueueUrl();
     }
 }

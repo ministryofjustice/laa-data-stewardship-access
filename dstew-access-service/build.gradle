@@ -5,6 +5,7 @@ plugins {
     id 'com.avast.gradle.docker-compose' version '0.17.12'
 }
 
+/*
 dockerCompose.isRequiredBy(integrationTest)
 
 dockerCompose {
@@ -17,7 +18,7 @@ dockerCompose {
         dockerExecutable.set(dockerPath)
     }
 }
-
+*/
 test {
     useJUnitPlatform()
     finalizedBy(jacocoTestReport)
@@ -67,11 +68,13 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation group: 'com.amazonaws', name: 'aws-java-sdk', version: "$awsJavaSdkVersion"
+    testImplementation group: 'com.amazonaws', name: 'aws-java-sdk-sqs', version: "$awsJavaSdkVersion"
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:testcontainers'
     testImplementation 'org.testcontainers:postgresql'
-    testImplementation 'org.testcontainers:localstack'
+    testImplementation "org.testcontainers:localstack:$testcontainersLocalstack"
+    testImplementation "cloud.localstack:localstack-utils:$localstackUtils"
 
-    //developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
