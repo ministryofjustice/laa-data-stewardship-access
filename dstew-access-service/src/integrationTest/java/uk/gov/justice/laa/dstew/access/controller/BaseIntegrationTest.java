@@ -1,7 +1,11 @@
 package uk.gov.justice.laa.dstew.access.controller;
 
-import org.junit.jupiter.api.BeforeAll;
 import cloud.localstack.awssdkv1.TestUtils;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import org.junit.jupiter.api.BeforeAll;
 import com.amazonaws.services.sqs.AmazonSQS;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -50,13 +54,25 @@ public class BaseIntegrationTest {
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
+        // TODO  remove String endpoint...
+        String endpoint = localStackContainer.getEndpointOverride(SQS).toString();
         registry.add("spring.cloud.aws.sqs.endpoint",
-                () -> localStackContainer.getEndpointOverride(SQS).toString());
+                () -> endpoint);
     }
 
     @BeforeAll
     static void beforeAll() {
-        amazonSQS = TestUtils.getClientSQS(localStackContainer.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
+
+        amazonSQS = AmazonSQSClientBuilder.standard()
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
+                        localStackContainer.getEndpointOverride(LocalStackContainer.Service.SQS).toString(),
+                        localStackContainer.getRegion())
+                        )
+                .withCredentials(new AWSStaticCredentialsProvider(
+                        new BasicAWSCredentials("test", "test"))
+                )
+                .build();
+
         queueUrl = amazonSQS.createQueue("test-queue").getQueueUrl();
     }
 }

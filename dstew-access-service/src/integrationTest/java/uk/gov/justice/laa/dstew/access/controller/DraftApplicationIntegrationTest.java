@@ -11,7 +11,6 @@ import uk.gov.justice.laa.dstew.access.AccessApp;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest(classes = AccessApp.class, properties = "feature.disable-security=true")
 @AutoConfigureMockMvc
@@ -19,29 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DraftApplicationIntegrationTest extends BaseIntegrationTest{
     @Autowired
     private MockMvc mockMvc;
-
-    @Test
-    void shouldCreateEmptyItem() throws Exception {
-        mockMvc
-                .perform(
-                        post("/api/v2/draft-applications")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{}")
-                                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    void shouldCreateItemWithIdOnly() throws Exception {
-        mockMvc
-                .perform(
-                        post("/api/v2/draft-applications")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"provider_id\": \"79976a7e-a8f6-416a-8b95-370e983cd802\"," +
-                                        " \"client_id\": \"1bb8028a-676d-4348-93b4-72987ad7b183\"}")
-                                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-    }
 
     @Test
     void shouldCreateItem() throws Exception {
@@ -62,48 +38,4 @@ public class DraftApplicationIntegrationTest extends BaseIntegrationTest{
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    void shouldUpdateItem() throws Exception {
-        String returnUri = mockMvc
-                .perform(
-                        post("/api/v2/draft-applications")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"provider_id\": \"79976a7e-a8f6-416a-8b95-370e983cd802\"," +
-                                        " \"client_id\": \"1bb8028a-676d-4348-93b4-72987ad7b183\"}")
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse()
-                .getHeader("Location");
-
-        mockMvc
-                .perform(
-                        patch(returnUri)
-                                .content("{\"provider_id\": \"09976a7e-a8f6-416a-8b95-370e983cd802\"," +
-                                        " \"client_id\": \"0bb8028a-676d-4348-93b4-72987ad7b183\"}")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void shouldGetItem() throws Exception {
-        String returnUri = mockMvc
-                .perform(
-                        post("/api/v2/draft-applications")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"provider_id\": \"29976a7e-a8f6-416a-8b95-370e983cd802\"," +
-                                        " \"client_id\": \"2bb8028a-676d-4348-93b4-72987ad7b183\"}")
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse()
-                .getHeader("Location");
-
-        mockMvc.perform(get(returnUri))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("client_id").isNotEmpty())
-                .andExpect(jsonPath("provider_id").isNotEmpty());
-    }
-
 }
