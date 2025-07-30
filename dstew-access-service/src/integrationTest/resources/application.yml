@@ -5,8 +5,3 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
     generate-ddl: false
-  cloud:
-    aws:
-      credentials:
-        access-key: test
-        secret-key: test

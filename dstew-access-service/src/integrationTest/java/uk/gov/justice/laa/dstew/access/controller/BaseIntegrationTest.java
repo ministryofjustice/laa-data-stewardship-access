@@ -32,7 +32,10 @@ public class BaseIntegrationTest {
     public static LocalStackContainer localStackContainer =
             new LocalStackContainer(
                     DockerImageName.parse("localstack/localstack:3"))
-            .withServices(SQS);
+            .withServices(SQS)
+            .withEnv("HOSTNAME_EXTERNAL", "localhost")
+            .withEnv("DEFAULT_REGION", "eu-west-2")
+            .withExposedPorts(4566);
 
     @Container
     @ServiceConnection
