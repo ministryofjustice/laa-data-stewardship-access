@@ -14,18 +14,26 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 @Configuration
 public class SqsConfig {
 
+  private final SqsProperties sqsProperties;
+
+  public SqsConfig(final SqsProperties sqsProperties) {
+    this.sqsProperties = sqsProperties;
+  }
+
   /**
    * Provides an injectable queue client.
    *
    * @return the queue client.
    */
+
   @Bean
   public SqsAsyncClient sqsAsyncClient() {
+    String endPoint =  sqsProperties.getEndPoint();
     return SqsAsyncClient.builder()
-        .endpointOverride(URI.create("http://localhost:4566"))
+        .endpointOverride(URI.create(endPoint))
         .region(Region.US_EAST_1)
         .credentialsProvider(StaticCredentialsProvider.create(
-            AwsBasicCredentials.create("test", "test")))
+            AwsBasicCredentials.create(sqsProperties.getAccessKey(), sqsProperties.getSecretKey())))
         .build();
   }
 }

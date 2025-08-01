@@ -23,7 +23,7 @@ public class SqsConsumer {
    *
    * @param message the message being received.
    */
-  @SqsListener("test-queue")
+  @SqsListener(value = "${cloud-platform.aws.sqs.queue.default}")
   public void receiveMessage(String message) {
     try {
       var historyMessage = objectMapper.readValue(message, ApplicationV1HistoryMessage.class);

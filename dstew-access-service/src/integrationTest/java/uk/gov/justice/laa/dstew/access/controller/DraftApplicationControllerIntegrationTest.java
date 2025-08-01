@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = AccessApp.class, properties = "feature.disable-security=true")
 @AutoConfigureMockMvc
 @Transactional
-@Disabled
 public class DraftApplicationControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;

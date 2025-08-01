@@ -16,7 +16,6 @@ public class SqsProducer {
 
   private final SqsAsyncClient sqsAsyncClient;
   private final ObjectMapper objectMapper;
-  private final String queueUrl = "http://localhost:4566/000000000000/test-queue";
 
   /**
    * Create a message producer.
@@ -35,6 +34,7 @@ public class SqsProducer {
    * @param message the object to serialize and send.
    */
   public void createHistoricRecord(ApplicationV1HistoryMessage message) {
+    String queueUrl = "http://localhost:4566/000000000000/test-queue";
     try {
       String json = objectMapper.writeValueAsString(message);
       SendMessageRequest request = SendMessageRequest.builder()

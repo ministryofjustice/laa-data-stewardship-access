@@ -22,7 +22,6 @@ import uk.gov.justice.laa.dstew.access.AccessApp;
 @SpringBootTest(classes = AccessApp.class, properties = "feature.disable-security=true")
 @AutoConfigureMockMvc
 @Transactional
-@Disabled
 public class ApplicationV1ControllerIntegrationTest {
 
   @Autowired

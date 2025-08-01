@@ -5,3 +5,20 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
     generate-ddl: false
+
+  cloud:
+    aws:
+      credentials:
+        access-key: test
+        secret-key: test
+      region:
+        static: us-east-1
+
+cloud-platform:
+  aws:
+    sqs:
+      endpoint: http://localhost:4566
+      access-key: test
+      secret-key: test
+      queue:
+        default: test-queue
