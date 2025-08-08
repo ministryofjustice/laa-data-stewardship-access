@@ -17,38 +17,44 @@ Includes the following subprojects:
 
 ### To do items
 - Continue to update this `README.md` file to include information such as what this project does.
-- Ensure at least one team is granted Admin permissions.
 - Agree provisional content of `CODEOWNERS` file and PR review policy (e.g. number of reviewers).
 - Ensure the project has been added to the [Legal Aid Agency Snyk](https://app.snyk.io/org/legal-aid-agency) organisation.
 - Check why `build-test-pr.yml` and `pr-merge-main.yml` were not brought across.
-- Add a database schema migrations tool such as Liquibase or Flyway.
 
 ## Build and run application
+### Developing application within Intellij
+Java version 21 is recommended
+
+Set the security environment variable
+`FEATURE_DISABLESECURITY=true`
 
 ### Build application
+Execute
+
 `./gradlew clean build`
 
 Note that completing the build and unit tests currently requires:
 - GitHub token with `read:packages` access - used by [`laa-ccms-spring-boot-gradle-plugin`](#gradle-plugin-used)
-- Running `docker compose up -d` to start up PostgreSQL and LocalStack - used by unit tests
 
 ### Run integration tests
+Execute
+
 `./gradlew integrationTest`
 
 ### Run application
-`./gradlew bootRun`
+To start up Localstack and Postgres
 
-### Run application dependencies via Docker
-`docker compose up`
-Failure to start Docker and run this command prior to running application (including debugging) will give a Postgres connectivity error. 
+`docker compose up -d`
+
+Then execute
+
+`./gradlew bootRun`
 
 ### Dropping database tables (may not be applicable)
 You may need to drop database tables manually prior to running app so Flyway can create the latest schema. To do this:
 - Start up a Postgres management tool e.g. pgadmin
 - Go to the laa_db database
 - Drop the tables
-
-## Application endpoints
 
 ### API documentation
 #### Swagger UI
