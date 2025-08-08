@@ -42,6 +42,10 @@ Execute
 `./gradlew integrationTest`
 
 ### Run application
+If the environment setting does not exist then set it
+
+`export FEATURE_DISABLESECURITY=true`
+
 To start up Localstack and Postgres
 
 `docker compose up -d`
