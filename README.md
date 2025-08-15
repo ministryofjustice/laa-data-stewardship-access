@@ -7,6 +7,19 @@ Source code for LAA Digital's Access Data Stewardship API, owned by the Access D
 This API will provide a trusted API source of truth for the Civil Applications and Civil Decide projects for data
 related to applications, proceedings, delegated functions, scope limitations, cost limitations and level of service.
 
+### Add GitHub Token
+Generate a Github PAT (Personal Access Token) to access the required plugin, via https://github.com/settings/tokens
+
+Specify the Note field, e.g. “Token to allow access to LAA Gradle plugin”
+
+If you haven’t got a gradle.properties file create one under ~/.gradle/gradle.properties
+
+Add the following properties to ~/.gradle/gradle.properties and replace the placeholder values as follows:
+
+project.ext.gitPackageUser = YOUR_GITHUB_USERNAME
+project.ext.gitPackageKey = PAT_CREATED_ABOVE
+Go back to Github to authorize MOJ for SSO
+
 ### Project structure
 Includes the following subprojects:
 
